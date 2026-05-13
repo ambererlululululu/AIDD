@@ -1,0 +1,45 @@
+{
+  "id": "c34-egfr",
+  "name": "C34 — EGFR C797S Inhibitor",
+  "description": {
+    "en": "Optimizing C34 for EGFR triple mutant resistance",
+    "zh": "优化 C34 先导化合物，针对 EGFR 三重突变耐药"
+  },
+  "reference": {
+    "name": "C34",
+    "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(F)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN(C)C)c4)n3)s2)CC1",
+    "target": "EGFR L858R/T790M/C797S",
+    "mechanism": "Non-covalent reversible inhibitor",
+    "generation": "4th-gen candidate",
+    "indication": "NSCLC (osimertinib-resistant)",
+    "source": "Zhu et al. 2023",
+    "source_full": "Zhu et al. 2023, J. Med. Chem. 66(21), 14633-14652",
+    "ic50_nm": 5.1,
+    "scaffold": "thiazole-pyrimidine"
+  },
+  "positions": [
+    {
+      "name": "Aryl",
+      "key": "aryl",
+      "original": "para-F",
+      "generator": "aryl"
+    },
+    {
+      "name": "Sulfonyl",
+      "key": "sulfonyl",
+      "original": "EtSO₂",
+      "generator": "sulfonyl"
+    },
+    {
+      "name": "Tail",
+      "key": "tail",
+      "original": "NMe₂-ethyl",
+      "generator": "tail"
+    }
+  ],
+  "context": {
+    "en": "Optimizing C34 (Zhu et al. 2023), a non-covalent EGFR C797S inhibitor (IC₅₀ 5.1 nM), across 3 modification sites. Candidates generated via RDKit SMARTS transforms; scored by physicochemical properties, structural alerts, and 3D shape complementarity.",
+    "zh": "优化先导化合物 C34（Zhu et al. 2023），非共价 EGFR C797S 抑制剂（IC₅₀ 5.1 nM），在 3 个位点进行结构修饰。候选分子由 RDKit SMARTS 变换生成，基于理化性质、结构警报和 3D 形状互补性评分。"
+  },
+  "status": "active"
+}

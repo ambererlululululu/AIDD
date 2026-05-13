@@ -1,0 +1,23 @@
+{
+  "id": "demo-kras",
+  "name": "KRAS G12C — Covalent Inhibitor",
+  "description": {
+    "en": "Next-gen KRAS G12C inhibitors to overcome sotorasib/adagrasib resistance",
+    "zh": "新一代 KRAS G12C 抑制剂，克服索托拉西布/阿达格拉西布耐药"
+  },
+  "reference": {
+    "name": "Sotorasib",
+    "smiles": "C=CC(=O)N1CCC(N2C(=O)C(CC3=CC=C(O)C=C3)=CC2C)CC1",
+    "target": "KRAS G12C",
+    "mechanism": "Covalent inhibitor (Switch II pocket)",
+    "generation": "1st-gen",
+    "indication": "NSCLC (KRAS G12C mutant)",
+    "source": "Canon et al. 2019",
+    "ic50_nm": 12
+  },
+  "context": {
+    "en": "Designing next-gen KRAS G12C covalent inhibitors with improved potency and reduced adaptive resistance mechanisms (RTK bypass, RAS-MAPK reactivation).",
+    "zh": "设计新一代 KRAS G12C 共价抑制剂，提高活性并减少适应性耐药（RTK 旁路、RAS-MAPK 再激活）。"
+  },
+  "status": "coming_soon"
+}

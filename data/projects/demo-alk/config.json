@@ -1,0 +1,23 @@
+{
+  "id": "demo-alk",
+  "name": "ALK — Lorlatinib-Resistant Mutations",
+  "description": {
+    "en": "Overcoming compound ALK mutations (G1202R/L1196M) in lorlatinib-resistant NSCLC",
+    "zh": "克服洛拉替尼耐药 NSCLC 中的 ALK 复合突变 (G1202R/L1196M)"
+  },
+  "reference": {
+    "name": "Lorlatinib",
+    "smiles": "C1CC1C1=NN=C2C=C(NC(=O)C3=CC(F)=C(F)C(F)=C3)C=CC2=C1C#N",
+    "target": "ALK (G1202R/L1196M)",
+    "mechanism": "3rd-gen ALK TKI",
+    "generation": "3rd-gen",
+    "indication": "NSCLC (ALK fusion, multi-TKI resistant)",
+    "source": "Shaw et al. 2020",
+    "ic50_nm": 1.3
+  },
+  "context": {
+    "en": "Exploring 4th-gen ALK inhibitors to address compound mutations emerging under lorlatinib pressure, focusing on maintaining brain penetration.",
+    "zh": "探索第四代 ALK 抑制剂，解决洛拉替尼治疗压力下出现的复合突变，同时维持脑渗透性。"
+  },
+  "status": "coming_soon"
+}

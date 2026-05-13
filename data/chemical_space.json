@@ -1,0 +1,184 @@
+{
+  "coordinates": [
+    {
+      "x": -1.857373,
+      "y": -0.204791,
+      "name": "C34 (参考)",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(F)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN(C)C)c4)n3)s2)CC1",
+      "group": "参考化合物",
+      "score": null
+    },
+    {
+      "x": 5.815175,
+      "y": -3.745142,
+      "name": "Osimertinib",
+      "smiles": "C=CC(=O)Nc1nc(Nc2ccc(N(C)CCN(C)C)cc2OC)ncc1-c1cn(C)c2ccccc12",
+      "group": "参考化合物",
+      "score": null
+    },
+    {
+      "x": 5.76581,
+      "y": 5.596344,
+      "name": "BLU-945",
+      "smiles": "CC1C(CN1C2=C3C=NC(=CC3=C(C=C2)C(C)C)NC4=NC(=NC=C4)N5CCC(C(C5)F)OC)CS(=O)(=O)C",
+      "group": "参考化合物",
+      "score": null
+    },
+    {
+      "x": 6.528039,
+      "y": -0.132867,
+      "name": "TQB3804",
+      "smiles": "CC1=CC(=C(C=C1N2CCC(CC2)N3CCN(CC3)C)OC)NC4=NC=C(C(=N4)NC5=C(C6=NC=CN=C6C=C5)P(=O)(C)C)Br",
+      "group": "参考化合物",
+      "score": null
+    },
+    {
+      "x": 6.387299,
+      "y": -1.679915,
+      "name": "Afatinib",
+      "smiles": "CN(C)/C=C/C(=O)Nc1cc2c(Nc3ccc(F)c(Cl)c3)ncnc2cc1O[C@@H]1CCOC1",
+      "group": "参考化合物",
+      "score": null
+    },
+    {
+      "x": -1.462437,
+      "y": -0.679584,
+      "name": "C34-aryl-chloro",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(Cl)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN(C)C)c4)n3)s2)CC1",
+      "group": "Aryl",
+      "score": 67.1
+    },
+    {
+      "x": -1.460882,
+      "y": -0.623969,
+      "name": "C34-aryl-bromo",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(Br)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN(C)C)c4)n3)s2)CC1",
+      "group": "Aryl",
+      "score": 66.9
+    },
+    {
+      "x": -1.368722,
+      "y": -0.722941,
+      "name": "C34-aryl-H (remove)",
+      "smiles": "[H]c1ccc(-c2nc(C3CCN(S(=O)(=O)CC)CC3)sc2-c2ccnc(Nc3ccc4c(ccn4CCN(C)C)c3)n2)cc1",
+      "group": "Aryl",
+      "score": 52.8
+    },
+    {
+      "x": -1.61469,
+      "y": -0.477513,
+      "name": "C34-aryl-trifluoromethyl",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(C(F)(F)F)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN(C)C)c4)n3)s2)CC1",
+      "group": "Aryl",
+      "score": 55.7
+    },
+    {
+      "x": -1.271774,
+      "y": -0.638604,
+      "name": "C34-aryl-methoxy",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(OC)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN(C)C)c4)n3)s2)CC1",
+      "group": "Aryl",
+      "score": 41.4
+    },
+    {
+      "x": -1.608948,
+      "y": -0.61417,
+      "name": "C34-aryl-cyano",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(C#N)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN(C)C)c4)n3)s2)CC1",
+      "group": "Aryl",
+      "score": 62.6
+    },
+    {
+      "x": -1.466368,
+      "y": -0.314227,
+      "name": "C34-sulfonyl-methylsulfonyl",
+      "smiles": "CN(C)CCn1ccc2cc(Nc3nccc(-c4sc(C5CCN(S(C)(=O)=O)CC5)nc4-c4ccc(F)cc4)n3)ccc21",
+      "group": "Sulfonyl",
+      "score": 62.4
+    },
+    {
+      "x": -1.426252,
+      "y": -0.297287,
+      "name": "C34-sulfonyl-isopropylsulfonyl",
+      "smiles": "CC(C)S(=O)(=O)N1CCC(c2nc(-c3ccc(F)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN(C)C)c4)n3)s2)CC1",
+      "group": "Sulfonyl",
+      "score": 57.7
+    },
+    {
+      "x": -1.514394,
+      "y": -0.399669,
+      "name": "C34-sulfonyl-cyclopropylsulfonyl",
+      "smiles": "CN(C)CCn1ccc2cc(Nc3nccc(-c4sc(C5CCN(S(=O)(=O)C6CC6)CC5)nc4-c4ccc(F)cc4)n3)ccc21",
+      "group": "Sulfonyl",
+      "score": 52.8
+    },
+    {
+      "x": -0.945924,
+      "y": -0.976347,
+      "name": "C34-sulfonyl-acetyl",
+      "smiles": "CC(=O)N1CCC(c2nc(-c3ccc(F)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN(C)C)c4)n3)s2)CC1",
+      "group": "Sulfonyl",
+      "score": 60.5
+    },
+    {
+      "x": -0.934219,
+      "y": -0.794616,
+      "name": "C34-sulfonyl-N-H (remove cap)",
+      "smiles": "CN(C)CCn1ccc2cc(Nc3nccc(-c4sc(C5CCNCC5)nc4-c4ccc(F)cc4)n3)ccc21",
+      "group": "Sulfonyl",
+      "score": 56.7
+    },
+    {
+      "x": -1.461742,
+      "y": 1.157095,
+      "name": "C34-tail-morpholine-ethyl",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(F)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN5CCOCC5)c4)n3)s2)CC1",
+      "group": "Tail",
+      "score": 61.5
+    },
+    {
+      "x": -1.599381,
+      "y": 1.23661,
+      "name": "C34-tail-piperazine-ethyl",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(F)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN5CCNCC5)c4)n3)s2)CC1",
+      "group": "Tail",
+      "score": 58.2
+    },
+    {
+      "x": -1.54219,
+      "y": 1.21132,
+      "name": "C34-tail-pyrrolidine-ethyl",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(F)cc3)c(-c3ccnc(Nc4ccc5c(ccn5CCN5CCCC5)c4)n3)s2)CC1",
+      "group": "Tail",
+      "score": 57.7
+    },
+    {
+      "x": -0.971331,
+      "y": 1.066078,
+      "name": "C34-tail-simple-methyl",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(F)cc3)c(-c3ccnc(Nc4ccc5c(ccn5C)c4)n3)s2)CC1",
+      "group": "Tail",
+      "score": 58.0
+    },
+    {
+      "x": -1.666194,
+      "y": 0.493818,
+      "name": "C34-tail-diethylamine-ethyl",
+      "smiles": "CCN(CC)CCn1ccc2cc(Nc3nccc(-c4sc(C5CCN(S(=O)(=O)CC)CC5)nc4-c4ccc(F)cc4)n3)ccc21",
+      "group": "Tail",
+      "score": 39.4
+    },
+    {
+      "x": -0.323493,
+      "y": 1.540377,
+      "name": "C34-tail-H (free indole)",
+      "smiles": "CCS(=O)(=O)N1CCC(c2nc(-c3ccc(F)cc3)c(-c3ccnc(Nc4ccc5[nH]ccc5c4)n3)s2)CC1",
+      "group": "Tail",
+      "score": 56.8
+    }
+  ],
+  "explained_variance": [
+    0.3571,
+    0.1164
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "demo-pdl1",
+  "name": "PD-L1 — Small Molecule Inhibitor",
+  "description": {
+    "en": "Small molecule PD-1/PD-L1 inhibitors as oral alternatives to antibody checkpoint therapy",
+    "zh": "小分子 PD-1/PD-L1 抑制剂，作为抗体检查点疗法的口服替代方案"
+  },
+  "reference": {
+    "name": "BMS-986189",
+    "smiles": "CC1=CC(=CC(C)=C1OC)C1=CC2=C(C=C1)C(=O)N(C1CCCCC1)C2=O",
+    "target": "PD-L1",
+    "mechanism": "PD-L1 dimerization inducer",
+    "generation": "Exploratory",
+    "indication": "Solid tumors (oral checkpoint inhibitor)",
+    "source": "Guzik et al. 2023",
+    "ic50_nm": 18
+  },
+  "context": {
+    "en": "Optimizing biphenyl-based PD-L1 dimerization inducers for oral bioavailability, targeting tumors where antibody delivery is limited.",
+    "zh": "优化联苯类 PD-L1 二聚化诱导剂的口服生物利用度，针对抗体递送受限的肿瘤。"
+  },
+  "status": "coming_soon"
+}

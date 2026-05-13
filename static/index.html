@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR Deliberation</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/static/style.css?v=24">
+    <script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <header class="sar-header">
+        <div class="header-left">
+            <img class="header-logo" src="/static/favicon.svg" alt="logo">
+            <div>
+                <h1>SAR Deliberation</h1>
+                <div class="subtitle" data-i18n="subtitle">AI-Driven Drug Discovery</div>
+                <div class="project-context" id="project-context"></div>
+            </div>
+        </div>
+        <div class="header-right-group">
+            <span class="project-label hidden" id="project-label" data-i18n="projectLabel">Project</span>
+            <select class="project-select hidden" id="project-select" onchange="switchProject(this.value)"></select>
+            <button class="lang-toggle" onclick="toggleLang()">中文</button>
+        </div>
+    </header>
+
+    <!-- App Layout: Sidebar + View Container -->
+    <main class="app-layout no-sidebar">
+
+        <!-- Shared Sidebar -->
+        <aside id="sidebar" class="hidden">
+            <button class="sidebar-collapse-btn" onclick="toggleMolPanel()" title="Toggle sidebar">
+                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <div class="sidebar-inner">
+                <div class="sidebar-nav">
+                    <button class="sidebar-nav-btn active" id="nav-home" onclick="switchView('home')">
+                        <svg class="sidebar-nav-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" fill="currentColor"/>
+                        </svg>
+                        <span class="sidebar-nav-label" data-i18n="home">Home</span>
+                    </button>
+                    <button class="sidebar-nav-btn" id="nav-knowledge" onclick="switchView('knowledge')">
+                        <svg class="sidebar-nav-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" fill="currentColor"/>
+                        </svg>
+                        <span class="sidebar-nav-label" data-i18n="knowledgeBase">Knowledge</span>
+                    </button>
+                </div>
+                <div class="mol-list hidden" id="molecule-list">
+                    <div class="mol-list-header">
+                        <span data-i18n="sidebarMolecules">Molecules</span>
+                        <span id="mol-count"></span>
+                    </div>
+                    <div class="mol-filter-tabs" id="mol-filter-tabs"></div>
+                    <div class="mol-list-scroll" id="mol-list-body"></div>
+                </div>
+                <div class="mol-list-user" onclick="showToast(lang === 'zh' ? '登录功能开发中' : 'Sign-in coming soon')">
+                    <div class="user-avatar">
+                        <svg viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10,11 C12.2,11 14,9.2 14,7 C14,4.8 12.2,3 10,3 C7.8,3 6,4.8 6,7 C6,9.2 7.8,11 10,11Z M10,12.5 C6.7,12.5 2,14.2 2,17 L2,18 L18,18 L18,17 C18,14.2 13.3,12.5 10,12.5Z"/>
+                        </svg>
+                    </div>
+                    <span class="user-label" data-i18n="signIn">Sign in</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- View Container -->
+        <div class="view-container">
+
+            <!-- HOME VIEW -->
+            <div id="view-home" class="view-pane active">
+                <div id="dashboard-content">
+                    <div class="loading"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <!-- KNOWLEDGE VIEW -->
+            <div id="view-knowledge" class="view-pane">
+                <div id="knowledge-content"></div>
+            </div>
+
+            <!-- PROJECT VIEW -->
+            <div id="view-project" class="view-pane">
+                <div class="stat-row" id="overview-cards"></div>
+                <section id="detail-panel">
+                    <div class="panel-tab-bar">
+                        <button class="tab-btn active" data-tab="detail" data-i18n="candidate" onclick="switchTab('detail')">Candidate</button>
+                        <button class="tab-btn" data-tab="heatmap" data-i18n="sarMatrix" onclick="switchTab('heatmap')">SAR Matrix</button>
+                        <button class="tab-btn" data-tab="comparison" data-i18n="compare" onclick="switchTab('comparison')">Compare</button>
+                        <button class="tab-btn" data-tab="analysis" onclick="switchTab('analysis')"><span data-i18n="analysis">Analysis</span> <span class="tab-ai-badge">✦ AI</span></button>
+                    </div>
+
+                    <div class="tab-pane active" id="tab-detail">
+                        <div id="molecule-detail"></div>
+                        <div class="panel-section">
+                            <div class="panel-section-title" onclick="toggleCollapsible('smiles-collapsible')">
+                                <span data-i18n="customMol">Custom Molecule</span> <span class="chevron">&#9662;</span>
+                            </div>
+                            <div id="smiles-collapsible" class="panel-section-body" style="display:none;">
+                                <div class="smiles-hint" data-i18n="smilesHint">Paste a SMILES string to evaluate any molecule against the reference compound.</div>
+                                <div class="smiles-presets" id="smiles-presets"></div>
+                                <div class="smiles-row">
+                                    <input type="text" class="smiles-input" id="smiles-input"
+                                           placeholder="e.g. CC(=O)Oc1ccccc1C(=O)O">
+                                    <button class="btn btn-primary btn-sm" data-i18n="evaluate" onclick="evaluateSmiles()">Evaluate</button>
+                                </div>
+                                <div id="smiles-result" class="mt-16"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-heatmap">
+                        <div class="tab-pane-body">
+                            <div class="heatmap-controls" id="heatmap-controls"></div>
+                            <div id="heatmap-charts"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-comparison">
+                        <div class="tab-pane-body">
+                            <div class="tab-hint" data-i18n="compareHint">Select 2–4 molecules to compare properties and radar profiles</div>
+                            <div class="compare-chips" id="compare-checkboxes"></div>
+                            <button class="btn btn-primary btn-sm mt-16" id="compare-btn" data-i18n="compareSelected" onclick="runComparison()">Compare Selected</button>
+                            <div id="compare-results"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-analysis">
+                        <div class="tab-pane-body">
+                            <div id="strategy-cards"></div>
+                            <div class="panel-section" id="context-section">
+                                <div class="panel-section-title" onclick="toggleCollapsible('context-collapsible')">
+                                    <span data-i18n="domainKnowledge">Domain Knowledge</span> <span class="chevron">&#9662;</span>
+                                </div>
+                                <div id="context-collapsible" class="panel-section-body" style="display:none;">
+                                    <div class="smiles-hint" data-i18n="contextHint">Paste paper excerpts, SAR rules, or design constraints to give agents deeper context.</div>
+                                    <textarea class="context-input" id="user-context"
+                                              placeholder="e.g. Zhu et al. found that fluorine at para position is optimal for EGFR binding..."></textarea>
+                                </div>
+                            </div>
+                            <div class="delib-bar-row">
+                                <input type="text" class="delib-input" id="analysis-focus"
+                                       placeholder="Analysis focus (optional)">
+                                <button class="btn btn-primary" id="start-btn" data-i18n="startAnalysis" onclick="startDeliberation()">Start Analysis</button>
+                            </div>
+                            <div id="analysis-empty" class="analysis-empty">
+                                <div class="analysis-flow">
+                                    <div class="flow-step">
+                                        <div class="flow-icon">1</div>
+                                        <div class="flow-label" data-i18n="r1">Independent Analysis</div>
+                                        <div class="flow-desc" data-i18n="flowDesc1">3 agents analyze all molecules from different perspectives</div>
+                                    </div>
+                                    <div class="flow-arrow">&rarr;</div>
+                                    <div class="flow-step">
+                                        <div class="flow-icon">2</div>
+                                        <div class="flow-label" data-i18n="r2">Cross-Challenge</div>
+                                        <div class="flow-desc" data-i18n="flowDesc2">Agents challenge each other's findings with your guidance</div>
+                                    </div>
+                                    <div class="flow-arrow">&rarr;</div>
+                                    <div class="flow-step">
+                                        <div class="flow-icon">3</div>
+                                        <div class="flow-label" data-i18n="r3">Convergence</div>
+                                        <div class="flow-desc" data-i18n="flowDesc3">Agents reach consensus on rankings and recommendations</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="round1-area"></div>
+                            <div id="review-gate" class="hidden"></div>
+                            <div id="round2-area"></div>
+                            <div id="round3-area"></div>
+                            <div id="delib-summary"></div>
+                            <div class="panel-section" id="history-section" style="margin-top:16px;">
+                                <div class="panel-section-title" onclick="toggleCollapsible('history-collapsible')">
+                                    <span data-i18n="historyTitle">Deliberation History</span> <span class="chevron">&#9662;</span>
+                                </div>
+                                <div id="history-collapsible" class="panel-section-body" style="display:none;">
+                                    <div id="history-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+</div>
+
+<script src="/static/app.js?v=27"></script>
+</body>
+</html>

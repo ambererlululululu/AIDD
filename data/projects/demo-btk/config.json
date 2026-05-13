@@ -1,0 +1,39 @@
+{
+  "id": "demo-btk",
+  "name": "BTK C481S — Non-covalent Inhibitor",
+  "description": {
+    "en": "Exploring non-covalent BTK inhibitors for ibrutinib-resistant CLL",
+    "zh": "探索非共价 BTK 抑制剂，针对伊布替尼耐药的 CLL"
+  },
+  "reference": {
+    "name": "Pirtobrutinib",
+    "smiles": "CC(C)(O)c1ccc(-c2nn3ccnc3c3ccnc(N4CC(F)(F)C4)c23)cc1F",
+    "target": "BTK C481S",
+    "mechanism": "Non-covalent reversible inhibitor",
+    "generation": "Next-gen",
+    "indication": "CLL/MCL (ibrutinib-resistant)",
+    "source": "Mato et al. 2021",
+    "source_full": "Mato et al. 2021, N Engl J Med 385, 2325-2336",
+    "ic50_nm": 3.7,
+    "scaffold": "pyrazolo-pyrimidine"
+  },
+  "positions": [
+    {
+      "name": "Aryl",
+      "key": "aryl",
+      "original": "2-F-phenyl",
+      "generator": "aryl"
+    },
+    {
+      "name": "Linker",
+      "key": "linker",
+      "original": "azetidine",
+      "generator": "linker"
+    }
+  ],
+  "context": {
+    "en": "Optimizing a pirtobrutinib-class non-covalent BTK inhibitor for C481S-mutant resistance in relapsed CLL.",
+    "zh": "优化 pirtobrutinib 类非共价 BTK 抑制剂，针对复发性 CLL 中的 C481S 突变耐药。"
+  },
+  "status": "coming_soon"
+}

@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAR Deliberation — 产品思路</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #FFFFFF;
+    --bg-alt: #F7F7F7;
+    --text: #1A1A1A;
+    --text-2: #555;
+    --text-3: #999;
+    --border: #E0E0E0;
+    --border-light: #EEE;
+    --green: #76FB91;
+    --green-dim: rgba(118,251,145,0.10);
+    --green-border: rgba(118,251,145,0.3);
+    --blue: #76D4FB;
+    --gold: #FBD076;
+    --r: 3px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { font-size:16px; scroll-behavior:smooth; }
+  body {
+    font-family: 'Outfit', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .slide {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 80px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .slide-inner { max-width: 800px; width: 100%; margin: 0 auto; }
+  .slide-num {
+    position: absolute;
+    bottom: 20px;
+    right: 36px;
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 500;
+  }
+  .slide { position: relative; }
+
+  .tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  h1 { font-size: 36px; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
+  h2 { font-size: 24px; font-weight: 700; line-height: 1.3; margin-bottom: 14px; }
+  h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  p { font-size: 14px; color: var(--text-2); line-height: 1.7; }
+  strong { font-weight: 600; color: var(--text); }
+  .sub { font-size: 15px; color: var(--text-2); margin-bottom: 16px; }
+  .small { font-size: 12px; color: var(--text-3); }
+  .underline { border-bottom: 2px solid var(--green); padding-bottom: 1px; }
+
+  /* cover */
+  .cover-bar { width: 40px; height: 3px; background: var(--green); margin-bottom: 16px; }
+  .cover-logo { width: 28px; height: 28px; margin-bottom: 20px; }
+
+  /* big number */
+  .big { font-size: 88px; font-weight: 800; line-height: 1; margin: 12px 0 4px; letter-spacing: -0.03em; }
+
+  /* blockquote */
+  blockquote {
+    border-left: 3px solid var(--green);
+    padding: 8px 14px;
+    margin: 14px 0;
+    background: var(--bg-alt);
+  }
+  blockquote p { color: var(--text); font-size: 13px; }
+  blockquote cite { display: block; margin-top: 3px; font-size: 11px; color: var(--text-3); font-style: normal; }
+
+  /* table */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th {
+    text-align: left; padding: 7px 8px;
+    font-weight: 600; font-size: 10px; color: var(--text-3);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    border-bottom: 2px solid var(--text);
+  }
+  td { padding: 7px 8px; border-bottom: 1px solid var(--border-light); color: var(--text-2); }
+  tr:last-child td { border-bottom: none; }
+  tr.hl td { background: var(--green-dim); color: var(--text); font-weight: 600; border-left: 3px solid var(--green); }
+
+  /* three cards */
+  .cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 14px 0; }
+  .crd {
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--border);
+    border-radius: var(--r);
+  }
+  .crd-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin-bottom: 4px; }
+  .crd h3 { font-size: 13px; margin-bottom: 3px; }
+  .crd p { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  /* architecture */
+  .arch { border: 1px solid var(--border); border-radius: var(--r); padding: 16px; margin: 14px 0; }
+  .arch-layer {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 10px;
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .arch-layer:last-child { margin-bottom: 0; }
+  .arch-layer-tag {
+    position: absolute; top: -7px; left: 8px;
+    background: var(--bg); padding: 0 5px;
+    font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3);
+  }
+  .arch-layer.g { border-color: var(--green-border); }
+  .arch-layer.g .arch-layer-tag { color: #2D7A3E; }
+  .arch-layer.b { border-color: rgba(118,212,251,0.3); }
+  .arch-layer.b .arch-layer-tag { color: #0369A1; }
+  .arch-layer.y { border-color: rgba(251,208,118,0.3); }
+  .arch-layer.y .arch-layer-tag { color: #92400E; }
+
+  .agents { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-top: 3px; }
+  .ag {
+    text-align: center; padding: 8px 6px; border-radius: 2px;
+    border: 1px solid var(--border-light); background: var(--bg-alt);
+  }
+  .ag.sa { border-color: var(--green-border); background: var(--green-dim); }
+  .ag.mpo { border-color: rgba(118,212,251,0.25); background: rgba(118,212,251,0.06); }
+  .ag.risk { border-color: rgba(251,208,118,0.3); background: rgba(251,208,118,0.06); }
+  .ag strong { display: block; font-size: 12px; }
+  .ag span { font-size: 10px; color: var(--text-3); }
+  .arch-center { font-size: 12px; color: var(--text-2); text-align: center; padding: 2px 0; }
+
+  /* protocol inline */
+  .proto { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 12px 0; }
+  .proto-step { padding: 10px; border: 1px solid var(--border); border-radius: var(--r); }
+  .proto-step .step-tag { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; color: var(--text-3); margin-bottom: 3px; }
+  .proto-step h4 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .proto-step p { font-size: 11px; color: var(--text-2); line-height: 1.4; }
+
+  /* output list */
+  .outputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+  .out-item { padding: 10px; border: 1px solid var(--border); border-radius: var(--r); }
+  .out-item h4 { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+  .out-item p { font-size: 11px; color: var(--text-2); line-height: 1.4; }
+
+  /* closing */
+  .closing-line {
+    font-size: 18px; font-weight: 600; line-height: 1.5;
+    max-width: 520px; margin: 24px 0 0;
+    padding-top: 16px; border-top: 3px solid var(--green);
+  }
+
+  /* alt bg */
+  .alt { background: var(--bg-alt); }
+
+  /* appendix */
+  .appendix { min-height: auto; padding: 36px 80px; background: var(--bg-alt); }
+  .appendix h2 { font-size: 16px; margin-bottom: 8px; }
+
+  /* responsive */
+  @media (max-width:768px) {
+    .slide { padding: 28px 20px; }
+    .cards, .proto, .agents { grid-template-columns: 1fr; }
+    .outputs { grid-template-columns: 1fr; }
+    .appendix { padding: 28px 20px; }
+  }
+
+  ul.plain { list-style:none; padding:0; }
+  ul.plain li { padding: 3px 0 3px 12px; position:relative; font-size:13px; color:var(--text-2); }
+  ul.plain li::before { content:''; position:absolute; left:0; top:9px; width:4px; height:4px; border-radius:50%; background:var(--text); }
+
+  .flow-steps {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 0 6px;
+    align-items: stretch;
+    margin: 6px 0;
+  }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--text-3);
+    font-size: 18px;
+  }
+  @media (max-width:768px) {
+    .flow-steps { grid-template-columns: 1fr; }
+    .flow-arrow { justify-content: center; transform: rotate(90deg); }
+  }
+
+  .screenshot-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .screenshot-item {
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .screenshot-item img {
+    width: 100%;
+    display: block;
+  }
+  .screenshot-label {
+    display: block;
+    padding: 6px 8px;
+    font-size: 10px;
+    color: var(--text-3);
+    border-top: 1px solid var(--border-light);
+  }
+  @media (max-width:768px) {
+    .screenshot-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ 0. COVER ═══ -->
+<section class="slide">
+  <div class="slide-inner">
+    <svg class="cover-logo" viewBox="0 0 121 65.5" xmlns="http://www.w3.org/2000/svg" style="width:44px; height:24px;">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#b8fbc8"/>
+          <stop offset="45%" stop-color="#76FB91"/>
+          <stop offset="100%" stop-color="#2dd4a8"/>
+        </linearGradient>
+      </defs>
+      <path d="M 0.000 0.063 L 1.000 0.000 L 2.000 0.046 L 3.000 0.194 L 4.000 0.436 L 5.000 0.764 L 6.000 1.173 L 7.000 1.653 L 8.000 2.199 L 9.000 2.801 L 10.000 3.454 L 11.000 4.149 L 12.000 4.879 L 13.000 5.637 L 14.000 6.416 L 15.000 7.207 L 16.000 8.116 L 17.000 8.868 L 18.000 9.567 L 19.000 10.252 L 20.000 10.861 L 21.000 11.489 L 22.000 12.091 L 23.000 12.663 L 24.000 13.243 L 25.000 13.787 L 26.000 14.349 L 27.000 14.927 L 28.000 15.425 L 29.000 15.937 L 30.000 16.463 L 31.000 16.963 L 32.000 17.438 L 33.000 17.886 L 34.000 18.311 L 35.000 18.752 L 36.000 19.211 L 37.000 19.593 L 38.000 19.998 L 39.000 20.428 L 40.000 20.829 L 41.000 21.205 L 42.000 21.561 L 43.000 21.939 L 44.000 22.289 L 45.000 22.656 L 46.000 22.947 L 47.000 23.265 L 48.000 23.558 L 49.000 23.875 L 50.000 24.163 L 51.000 24.430 L 52.000 24.682 L 53.000 24.968 L 54.000 25.237 L 55.000 25.482 L 56.000 25.751 L 57.000 25.997 L 58.000 26.211 L 59.000 26.404 L 60.000 26.583 L 61.000 26.741 L 62.000 26.928 L 63.000 27.096 L 64.000 27.298 L 65.000 27.485 L 66.000 27.654 L 67.000 27.799 L 68.000 27.972 L 69.000 28.128 L 70.000 28.263 L 71.000 28.372 L 72.000 28.509 L 73.000 28.629 L 74.000 28.729 L 75.000 28.807 L 76.000 28.858 L 77.000 28.938 L 78.000 29.002 L 79.000 29.091 L 80.000 29.145 L 81.000 29.165 L 82.000 29.205 L 83.000 29.226 L 84.000 29.226 L 85.000 29.205 L 86.000 29.165 L 87.000 29.145 L 88.000 29.091 L 89.000 29.002 L 90.000 28.938 L 91.000 28.858 L 92.000 28.765 L 93.000 28.703 L 94.000 28.616 L 95.000 28.508 L 96.000 28.383 L 97.000 28.244 L 98.000 28.133 L 99.000 28.000 L 100.000 27.847 L 101.000 27.679 L 102.000 27.541 L 103.000 27.381 L 104.000 27.205 L 105.000 27.017 L 106.000 26.781 L 107.000 26.589 L 108.000 26.397 L 109.000 26.203 L 110.000 26.010 L 111.000 25.819 L 112.000 25.629 L 113.000 25.443 L 114.000 25.260 L 115.000 25.083 L 116.000 24.911 L 117.000 24.745 L 118.000 24.587 L 119.000 24.437 L 120.000 24.297 L 121.000 24.166 L 121.000 65.488 L 120.000 65.131 L 119.000 64.720 L 118.000 64.261 L 117.000 63.756 L 116.000 63.210 L 115.000 62.626 L 114.000 62.009 L 113.000 61.363 L 112.000 60.692 L 111.000 59.999 L 110.000 59.288 L 109.000 58.563 L 108.000 57.829 L 107.000 57.090 L 106.000 56.348 L 105.000 55.544 L 104.000 54.830 L 103.000 54.126 L 102.000 53.452 L 101.000 52.811 L 100.000 52.207 L 99.000 51.644 L 98.000 51.068 L 97.000 50.522 L 96.000 49.954 L 95.000 49.420 L 94.000 48.923 L 93.000 48.407 L 92.000 47.872 L 91.000 47.417 L 90.000 46.943 L 89.000 46.450 L 88.000 46.035 L 87.000 45.599 L 86.000 45.141 L 85.000 44.715 L 84.000 44.318 L 83.000 43.947 L 82.000 43.560 L 81.000 43.153 L 80.000 42.818 L 79.000 42.455 L 78.000 42.116 L 77.000 41.755 L 76.000 41.423 L 75.000 41.116 L 74.000 40.826 L 73.000 40.508 L 72.000 40.211 L 71.000 39.946 L 70.000 39.663 L 69.000 39.413 L 68.000 39.188 L 67.000 38.980 L 66.000 38.741 L 65.000 38.518 L 64.000 38.319 L 63.000 38.094 L 62.000 37.890 L 61.000 37.714 L 60.000 37.514 L 59.000 37.337 L 58.000 37.188 L 57.000 37.015 L 56.000 36.863 L 55.000 36.737 L 54.000 36.640 L 53.000 36.519 L 52.000 36.419 L 51.000 36.343 L 50.000 36.294 L 49.000 36.218 L 48.000 36.158 L 47.000 36.116 L 46.000 36.095 L 45.000 36.095 L 44.000 36.064 L 43.000 36.042 L 42.000 36.030 L 41.000 35.989 L 40.000 35.975 L 39.000 35.989 L 38.000 36.030 L 37.000 36.042 L 36.000 36.064 L 35.000 36.095 L 34.000 36.095 L 33.000 36.116 L 32.000 36.158 L 31.000 36.218 L 30.000 36.294 L 29.000 36.343 L 28.000 36.419 L 27.000 36.519 L 26.000 36.640 L 25.000 36.737 L 24.000 36.863 L 23.000 37.015 L 22.000 37.188 L 21.000 37.337 L 20.000 37.514 L 19.000 37.714 L 18.000 37.931 L 17.000 38.120 L 16.000 38.373 L 15.000 38.750 L 14.000 39.015 L 13.000 39.274 L 12.000 39.522 L 11.000 39.757 L 10.000 39.973 L 9.000 40.168 L 8.000 40.338 L 7.000 40.480 L 6.000 40.589 L 5.000 40.661 L 4.000 40.695 L 3.000 40.684 L 2.000 40.627 L 1.000 40.519 L 0.000 40.356 L 0.000 40.356 Z" fill="url(#lg)"/>
+    </svg>
+    <div class="cover-bar"></div>
+    <h1>SAR Deliberation</h1>
+    <p class="sub" style="color:var(--text-2);">先导化合物优化 &middot; 多 Agent 决策辅助</p>
+  </div>
+</section>
+
+<!-- ═══ 1. 起点 ═══ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="tag">起点</div>
+    <p style="max-width:580px; font-size:15px; color:var(--text); margin-bottom:8px;">
+      我注意到一个数字——给同一组分子数据，两位资深药物化学家做出相同决策的概率：
+    </p>
+    <div class="big">28%</div>
+    <p class="small">Lajiness 2004, Pharmacia/Lilly &middot; Kutchukian 2012 (Novartis) 重复实验一致性更低 (&lt;10%)</p>
+
+    <p style="margin-top:24px; max-width:560px;">
+      合成一个化合物要 $5K–50K，花 2–6 周。先导优化每轮从几十个方向里选 5–10 个来合成。选错一个，丢掉的是一整轮迭代周期。
+    </p>
+    <p style="margin-top:8px; max-width:560px;">
+      做这个选择用的工具？2026 年了，还是 Excel。
+    </p>
+    <p class="small" style="margin-top:2px;">Deloitte：仅 11% 药企完成数字化转型 &middot; Schrödinger 目标 2030 年 50% 采用率（意味着现在远低于此）</p>
+    <p style="margin-top:8px; max-width:560px;">
+      我想搞清楚这个环节为什么一直没有好用的工具。
+    </p>
+  </div>
+  <div class="slide-num">01</div>
+</section>
+
+<!-- ═══ 2. 诊断 ═══ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="tag">调研发现</div>
+    <h2>钱投在了别的地方</h2>
+
+    <div class="cards">
+      <div class="crd">
+        <div class="crd-tag">工具</div>
+        <h3>数据能看到，但选不好</h3>
+        <p>LiveDesign 被 Top 20 药企里 19 家用着。数据能看到了，但怎么从数据做出更好的选择，还是靠个人经验。</p>
+      </div>
+      <div class="crd">
+        <div class="crd-tag">AI</div>
+        <h3>钱都在生成和预测</h3>
+        <p>一百多亿美金砸在分子生成和 ADMET 预测（最新的 Latent-Y 已在抗体设计中做到 AI agent 从文本到实验验证）。但化学家每天头疼的——十几个参数打架时怎么取舍——还没什么工具能帮上忙。</p>
+      </div>
+      <div class="crd">
+        <div class="crd-tag">学术</div>
+        <h3>没标准答案，没人研究</h3>
+        <p>Kutchukian 2012 发现化学家只用 1–2 个参数在决策，自己不知道。这种没标准答案的问题，论文不好发，产品不好做。</p>
+      </div>
+    </div>
+
+    <p style="margin-top:8px;">
+      所以"从已有候选里选哪个来合成"这一步，到现在还没有特别好用的工具。
+    </p>
+    <p style="font-size:12px; color:var(--text-3); margin-top:4px;">
+      能发论文、能benchmark的问题，钱和人自然会过去。这个问题不好量化，所以一直没人做。
+    </p>
+  </div>
+  <div class="slide-num">02</div>
+</section>
+
+<!-- ═══ 3. 洞察 ═══ -->
+<section class="slide alt">
+  <div class="slide-inner">
+    <div class="tag">启发</div>
+    <h2>Sanofi 找了 92 个化学家</h2>
+    <p class="sub" style="max-width:540px;">
+      翻文献的时候找到了这篇。2025 年 Sanofi 让 92 名化学家对同一批化合物做预测，发在 <em>J. Med. Chem.</em> 上：
+    </p>
+    <table style="max-width:480px;">
+      <thead><tr><th>决策模式</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td>个人判断</td><td>基线</td></tr>
+        <tr><td>AI 模型</td><td>多数不如个人（除 hERG 外）</td></tr>
+        <tr class="hl"><td>集体智慧（多人独立判断后聚合）</td><td>优于个人和大多数 AI</td></tr>
+        <tr class="hl"><td>集体智慧 + AI 混合</td><td>最优</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px; max-width:560px;">
+      结论挺明确：多个人分别独立看数据再汇总，比一个人拍脑袋强，也比多数 AI 模型强。问题出在决策过程上。
+    </p>
+    <p style="margin-top:8px; font-size:13px; color:var(--text-2); max-width:560px;">
+      但你不可能每次决策都叫 92 个人来。
+    </p>
+  </div>
+  <div class="slide-num">03</div>
+</section>
+
+<!-- ═══ 4. 方案 ═══ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="tag">第一版 demo</div>
+    <h2>用 AI agent 模拟这个过程</h2>
+    <p style="max-width:560px; margin-bottom:14px;">
+      我的想法很直接：既然多人独立判断再汇总效果好，那能不能用 agent 来模拟？让多个 agent 各看同一份数据，独立分析，互相挑战。科学家看到多方争论的过程和分歧点，自己拍板。
+    </p>
+
+    <div class="arch">
+      <div class="arch-layer g">
+        <span class="arch-layer-tag">3–5 个 Agent · 各 3 步推理</span>
+        <div class="agents">
+          <div class="ag sa"><strong>Exploitation</strong><span>深化已知最优</span></div>
+          <div class="ag mpo"><strong>Exploration</strong><span>探索新空间</span></div>
+          <div class="ag risk"><strong>Risk</strong><span>ADMET / 合成风险</span></div>
+        </div>
+        <p style="font-size:11px; color:var(--text-2); text-align:center; margin-top:6px;">为什么这么分？Kutchukian 2012 发现化学家决策时主要在三件事之间拉扯：<br>押已有的最优解、试新方向、还是先排掉风险高的。每个 agent 替你把一个方向想透。</p>
+        <p style="font-size:10px; color:var(--text-3); text-align:center; margin-top:2px;">标准 3 个，全面模式可扩展至 5 个（+ ADMET 预测、合成可行性）</p>
+      </div>
+      <div class="arch-layer b">
+        <span class="arch-layer-tag">分析层</span>
+        <div class="arch-center">分歧检测 / 组合优化 / 趋势监控</div>
+      </div>
+      <div class="arch-layer y">
+        <span class="arch-layer-tag">计算层（无 LLM）</span>
+        <div class="arch-center">RDKit 确定性评分 + 3D shape similarity：MW, LogP, TPSA, QED, SA, PAINS, binding proxy ...</div>
+      </div>
+    </div>
+
+    <p style="font-size:10px; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-3); margin:18px 0 6px;">审议流程</p>
+    <div class="flow-steps">
+      <div class="proto-step">
+        <div class="step-tag">ROUND 1</div>
+        <h4>各看各的</h4>
+        <p>各个分析框架独立看数据，各出各的结论</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="proto-step">
+        <div class="step-tag">ROUND 2</div>
+        <h4>互相挑战</h4>
+        <p>拿分子证据互相质疑，科学家可以中途介入</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="proto-step">
+        <div class="step-tag">ROUND 3</div>
+        <h4>收敛出结论</h4>
+        <p>哪些达成共识、哪些还有分歧，建议下一步实验方向</p>
+      </div>
+    </div>
+
+    <p style="font-size:12px; color:var(--text-3); margin-top:4px;">
+      3 个 prompt 不同的 LLM 跟 92 个真人的独立判断是不是一回事？说实话我也不确定。但跑 demo 的时候发现，三个 agent 确实会在一些化合物上吵起来，不是换个说法表达同一个意思，是真的看法不一样。三个分析视角（Exploitation / Exploration / Risk）是从文献里提取的化学家决策维度（Kutchukian 2012），不是拍脑袋分的。
+    </p>
+  </div>
+  <div class="slide-num">04</div>
+</section>
+
+<!-- ═══ 5. Agent 推理链路 ═══ -->
+<section class="slide alt">
+  <div class="slide-inner">
+    <div class="tag">设计迭代</div>
+    <h2>让 agent 先提问，再查证，再下结论</h2>
+    <p style="max-width:560px; margin-bottom:14px;">
+      第一版跑下来有个问题：agent 一次性输出结论，看着流畅但经不起追问——没有文献支撑的判断，跟 ChatGPT 随便写一段没区别。
+    </p>
+    <p style="max-width:560px; margin-bottom:14px;">
+      所以在每个 agent 内部加了三步推理，参考了 DeepResearch 的 ReAct（Reason-Act）思路——不是一次性吐结论，而是先想清楚要查什么，查完再下判断：
+    </p>
+
+    <div class="proto">
+      <div class="proto-step">
+        <div class="step-tag">STEP 1 · PLAN</div>
+        <h4>提出问题</h4>
+        <p>只看分子数据，列出 3-5 个需要查文献才能回答的问题。这一步只提问，不给结论。</p>
+      </div>
+      <div class="proto-step">
+        <div class="step-tag">STEP 2 · INVESTIGATE</div>
+        <h4>查阅文献</h4>
+        <p>带着问题查 23KB 领域知识库，引用具体来源（论文名 + 数据点）。查不到的标"无直接证据"。</p>
+      </div>
+      <div class="proto-step">
+        <div class="step-tag">STEP 3 · CONCLUDE</div>
+        <h4>出结论</h4>
+        <p>基于第二步查到的证据写正式分析，每个判断要能追到具体文献。</p>
+      </div>
+    </div>
+
+    <blockquote style="margin-top:14px;">
+      <p>R2 交叉质疑同样三步：<strong>识别分歧 → 验证证据 → 发起挑战</strong>。</p>
+      <p style="margin-top:4px;">只有最终结论传给下一轮——中间推理过程在前端能看到，但不塞给其他 agent，让每轮讨论聚焦在结论上。</p>
+    </blockquote>
+
+    <p style="font-size:12px; color:var(--text-3); margin-top:8px;">
+      效果：分析从"看着合理的泛泛而谈"变成"引用 [Zhu 2023 Table 2] 说明 para 位氟代使 IC50 下降 3 倍"。每个 agent 的卡片里可以展开看它是怎么一步步想的。
+    </p>
+    <p style="font-size:12px; color:var(--text-3); margin-top:4px;">
+      注：agent 的引用不是自由发挥的——23KB 的论文原始数据在 Investigate 步骤直接喂给它，引用从这里面来，不是瞎编。
+    </p>
+  </div>
+  <div class="slide-num">05</div>
+</section>
+
+<!-- ═══ 6. 知识系统 ═══ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="tag">知识</div>
+    <h2>Agent 查文献的方式</h2>
+    <p style="max-width:560px; margin-bottom:14px;">
+      药企科学家 15-25% 的时间花在找信息上（IntuitionLabs）。光把数据摆出来不够，得让知识参与到分析里。
+    </p>
+    <p style="max-width:560px; margin-bottom:14px;">
+      知识分两层，用法不一样：
+    </p>
+
+    <div class="proto" style="grid-template-columns: 1fr 1fr;">
+      <div class="proto-step">
+        <div class="step-tag">始终注入 · ~6KB</div>
+        <h4>项目背景</h4>
+        <p>靶点、骨架、已知 SAR 规律的压缩摘要。agent 从一开始就知道这个项目在做什么。</p>
+      </div>
+      <div class="proto-step">
+        <div class="step-tag">ReAct 第二步按需调用 · ~23KB</div>
+        <h4>完整文献</h4>
+        <p>4 篇论文的 SAR 数据、binding mode、PK 参数。agent 带着具体问题去查，不是一股脑塞进去。</p>
+      </div>
+    </div>
+
+    <p style="margin-top:12px; max-width:560px; font-size:13px; color:var(--text-2);">
+      科学家也可以在跑分析前贴自己的笔记或论文摘要，agent 会跟着你给的方向走。
+    </p>
+    <p style="font-size:12px; color:var(--text-3); margin-top:8px;">
+      下一步：接 ChEMBL 等公共数据库，让 agent 能查到更广的活性数据。
+    </p>
+  </div>
+  <div class="slide-num">06</div>
+</section>
+
+<!-- ═══ 7. Demo ═══ -->
+<section class="slide alt">
+  <div class="slide-inner">
+    <div class="tag">Demo</div>
+    <h2>目前的 Demo 实现了初步的尝试</h2>
+    <p style="max-width:560px; margin-bottom:14px;">
+      输入一组 SAR 数据和项目文献，三轮跑完会给出：每个 agent 各自的分析（推理过程可以展开看）、agent 之间的分歧点、以及一份排好优先级的合成建议。科学家可以随时改方向，也可以贴自己的判断进去。
+    </p>
+
+    <div class="screenshot-grid">
+      <div class="screenshot-item">
+        <img src="static/screenshots/molecule_detail.png" alt="Molecule detail with radar chart" loading="lazy">
+        <span class="screenshot-label">单分子评估 · 结构差异 + 雷达图</span>
+      </div>
+      <div class="screenshot-item">
+        <img src="static/screenshots/sar_heatmap.png" alt="SAR heatmap matrix" loading="lazy">
+        <span class="screenshot-label">SAR 热力图 · 按修饰位点分组</span>
+      </div>
+      <div class="screenshot-item">
+        <img src="static/screenshots/analysis.png" alt="Multi-agent analysis panel" loading="lazy">
+        <span class="screenshot-label">多 Agent 分析 · 策略选择 + 三轮审议</span>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">07</div>
+</section>
+
+<!-- ═══ 8. 下一步 ═══ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="tag">产品思考</div>
+    <h2>如果继续做，下一步是什么</h2>
+
+    <p style="max-width:580px; margin-bottom:12px;">
+      demo 跑下来，agent 之间确实会吵——不是客气地"各有道理"，是在具体化合物上有真分歧。加了文献后分析也深了不少。不过离真正能用还差一截。
+    </p>
+
+    <div class="cards">
+      <div class="crd">
+        <div class="crd-tag">短期</div>
+        <h3>接 ChEMBL 数据</h3>
+        <p>同靶点已有化合物的活性数据，比论文更结构化。Agent 分析时有真实 benchmark 可以对比。</p>
+      </div>
+      <div class="crd">
+        <div class="crd-tag">中期</div>
+        <h3>迭代学习</h3>
+        <p>追踪科学家翻了哪些建议、采纳了哪些——科学家的实际选择反过来帮 agent 学会更好地判断。</p>
+      </div>
+      <div class="crd">
+        <div class="crd-tag">远期</div>
+        <h3>DMTA 闭环</h3>
+        <p>接入实验结果反馈，跨轮次追踪 SAR 趋势变化。从"每次单独分析"变成"跟着项目一起走"。</p>
+      </div>
+    </div>
+
+    <p style="max-width:580px; margin-top:12px;">
+      我不是药化背景。但这个问题往下挖，其实是认知问题——人脑同时权衡十几个参数的能力有限，碰巧这个问题发生在药化场景里。我能做的是把决策过程结构化，让领域专家的判断有更好的支撑。
+    </p>
+
+    <p class="small" style="margin-top:24px;">当前状态：可运行 demo，EGFR C797S 数据集（Zhu et al. 2023），已实现 ReAct 多步推理 + 23KB 知识库注入 + 用户上下文输入。</p>
+  </div>
+  <div class="slide-num">08</div>
+</section>
+
+<!-- ═══ APPENDIX ═══ -->
+<section class="slide appendix">
+  <div class="slide-inner">
+    <div class="tag">附录 A</div>
+    <h2>关键参考文献</h2>
+    <table>
+      <thead><tr><th>论文</th><th>年份</th><th>核心发现</th></tr></thead>
+      <tbody>
+        <tr><td>Lajiness et al.</td><td>2004</td><td>化学家自我一致性 50%，同行一致性 28%</td></tr>
+        <tr><td>Kutchukian et al.</td><td>2012</td><td>化学家仅用 1-2 参数决策且不自知</td></tr>
+        <tr><td>Choung et al., <em>Nature Comms</em></td><td>2023</td><td>35 人标注 kappa 0.32-0.4，专家直觉正交于计算指标</td></tr>
+        <tr><td>Llompart et al., <em>J. Med. Chem.</em></td><td>2025</td><td>92 人实验：集体智慧 > 个人 > 多数 AI</td></tr>
+        <tr><td>Truebel & Seidler, <em>Nat Rev Drug Disc</em></td><td>2022</td><td>117 名药企高管确认认知偏差是系统性问题</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide appendix">
+  <div class="slide-inner">
+    <div class="tag">附录 B</div>
+    <h2>多 Agent 科学决策先例</h2>
+    <table>
+      <thead><tr><th>系统</th><th>来源</th><th>关键结果</th></tr></thead>
+      <tbody>
+        <tr><td>Coated-LLM</td><td>iScience 2025</td><td>多智能体辩论准确率 0.82（vs 0.52），实验验证新疗法</td></tr>
+        <tr><td>AI Co-Scientist</td><td>Google 2025</td><td>generate-debate-evolve，靶点经实验确认</td></tr>
+        <tr><td>ChatInvent</td><td>AstraZeneca 2026</td><td>大药企已部署 multi-agent 分子设计</td></tr>
+        <tr><td>Virtual Biotech</td><td>Stanford 2026</td><td>11 agent 分析 55,984 临床试验</td></tr>
+        <tr><td>Latent-Y</td><td>Latent Labs 2026</td><td>AI agent 自主设计抗体，6/9 靶标实验验证，56× 加速</td></tr>
+      </tbody>
+    </table>
+    <p class="small" style="margin-top:6px;">注：上述系统做的是分子生成（"造什么"）。本系统做的是候选选择（"造了之后选哪个先合成"）——同一条流水线上的不同环节。</p>
+  </div>
+</section>
+
+<script>
+document.addEventListener('keydown', e => {
+  const all = [...document.querySelectorAll('.slide')];
+  const cur = all.findIndex(s => { const r = s.getBoundingClientRect(); return r.top >= -100 && r.top < innerHeight/2; });
+  if (['ArrowDown','ArrowRight',' '].includes(e.key)) { e.preventDefault(); all[Math.min(cur+1,all.length-1)].scrollIntoView({behavior:'smooth'}); }
+  if (['ArrowUp','ArrowLeft'].includes(e.key)) { e.preventDefault(); all[Math.max(cur-1,0)].scrollIntoView({behavior:'smooth'}); }
+});
+</script>
+
+</body>
+</html>

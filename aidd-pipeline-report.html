@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 驱动的药物发现：全链路深度解析</title>
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+<style>
+:root {
+  --bg: #0a0e1a; --bg2: #111827; --bg3: #1a2035;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --accent: #3b82f6; --accent2: #8b5cf6; --accent3: #06b6d4;
+  --green: #10b981; --orange: #f59e0b; --red: #ef4444; --pink: #ec4899;
+  --card: #1e293b; --border: #334155; --radius: 12px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; overflow-x: hidden; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent3); }
+
+.nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(10,14,26,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; height:56px; }
+.nav-logo { font-weight:700; font-size:1rem; color:var(--accent); margin-right:2rem; white-space:nowrap; }
+.nav-links { display:flex; gap:0.25rem; overflow-x:auto; flex:1; }
+.nav-links a { padding:0.4rem 0.75rem; border-radius:6px; font-size:0.8rem; color:var(--text2); white-space:nowrap; transition:all 0.2s; }
+.nav-links a:hover,.nav-links a.active { color:var(--accent); background:rgba(59,130,246,0.1); }
+.scroll-progress { position:fixed; top:56px; left:0; height:3px; z-index:101; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3)); width:0; transition:width 0.1s; }
+
+.hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6rem 2rem 4rem; text-align:center; background:radial-gradient(ellipse at 50% 30%,rgba(59,130,246,0.08) 0%,transparent 60%); }
+.hero h1 { font-size:clamp(2rem,5vw,3.5rem); font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:1rem; }
+.hero .subtitle { font-size:1.15rem; color:var(--text2); max-width:650px; margin-bottom:3rem; }
+
+.pipeline-flow { display:flex; align-items:center; gap:0; flex-wrap:wrap; justify-content:center; margin:2rem 0; max-width:1100px; }
+.pipeline-node { display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:all 0.3s; }
+.pipeline-node:hover { transform:translateY(-4px); }
+.pipeline-icon { width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:0.5rem; border:2px solid var(--border); background:var(--bg2); transition:all 0.5s; }
+.pipeline-node.active .pipeline-icon { border-color:var(--accent); box-shadow:0 0 20px rgba(59,130,246,0.4); background:rgba(59,130,246,0.15); }
+.pipeline-label { font-size:0.75rem; color:var(--text2); text-align:center; max-width:80px; }
+.pipeline-node.active .pipeline-label { color:var(--accent); font-weight:600; }
+.pipeline-arrow { width:40px; height:2px; background:var(--border); margin:0 -4px; margin-bottom:1.5rem; position:relative; }
+.pipeline-arrow::after { content:''; position:absolute; right:-4px; top:-4px; border:5px solid transparent; border-left:6px solid var(--border); }
+.pipeline-arrow.active { background:var(--accent); }
+.pipeline-arrow.active::after { border-left-color:var(--accent); }
+
+.section { max-width:1000px; margin:0 auto; padding:5rem 2rem; }
+.section-header { margin-bottom:3rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
+.stage-badge { display:inline-flex; align-items:center; gap:0.5rem; padding:0.3rem 1rem; border-radius:20px; font-size:0.85rem; font-weight:600; margin-bottom:1rem; }
+.section h2 { font-size:2rem; font-weight:700; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; }
+.section h2 .en { font-size:1rem; color:var(--text2); font-weight:400; }
+.section-summary { font-size:1.1rem; color:var(--text2); }
+.section h3 { font-size:1.3rem; font-weight:600; margin:2.5rem 0 1rem; padding-left:0.75rem; border-left:3px solid var(--accent); }
+
+.card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-bottom:1rem; transition:all 0.3s; }
+.card:hover { border-color:var(--accent); }
+.card-title { font-weight:600; font-size:1.1rem; margin-bottom:0.5rem; }
+
+.case-study { background:linear-gradient(135deg, rgba(245,158,11,0.08), rgba(236,72,153,0.05)); border:1px solid rgba(245,158,11,0.3); border-radius:var(--radius); padding:1.5rem; margin:1.5rem 0; position:relative; overflow:hidden; }
+.case-study::before { content:'CASE STUDY'; position:absolute; top:0; right:0; background:var(--orange); color:#000; font-size:0.7rem; font-weight:700; padding:0.2rem 0.8rem; border-radius:0 0 0 8px; letter-spacing:0.05em; }
+.case-study-title { font-weight:700; color:var(--orange); margin-bottom:0.5rem; font-size:1rem; }
+
+.flow-diagram { display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; justify-content:center; padding:2rem; margin:1.5rem 0; background:var(--bg2); border-radius:var(--radius); border:1px solid var(--border); }
+.flow-box { padding:0.6rem 1.2rem; border-radius:8px; font-size:0.9rem; font-weight:500; text-align:center; min-width:80px; }
+.flow-arrow-right { color:var(--text2); font-size:1.2rem; }
+
+.comparison-table { width:100%; border-collapse:collapse; margin:1.5rem 0; font-size:0.9rem; }
+.comparison-table th { background:var(--bg2); padding:0.75rem 1rem; text-align:left; font-weight:600; border-bottom:2px solid var(--accent); position:sticky; top:56px; z-index:10; }
+.comparison-table td { padding:0.75rem 1rem; border-bottom:1px solid var(--border); vertical-align:top; }
+.comparison-table tr:hover td { background:rgba(59,130,246,0.05); }
+.tag { display:inline-block; padding:0.15rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:500; }
+.tag-free { background:rgba(16,185,129,0.15); color:var(--green); }
+.tag-commercial { background:rgba(245,158,11,0.15); color:var(--orange); }
+.tag-freemium { background:rgba(139,92,246,0.15); color:var(--accent2); }
+.tag-opensource { background:rgba(6,182,212,0.15); color:var(--accent3); }
+
+.tech-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; margin:1.5rem 0; }
+.tech-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; text-align:center; transition:all 0.3s; }
+.tech-card:hover { border-color:var(--accent2); transform:translateY(-2px); }
+.tech-card .icon { font-size:2rem; margin-bottom:0.5rem; }
+.tech-card .name { font-weight:600; font-size:0.95rem; margin-bottom:0.25rem; }
+.tech-card .desc { font-size:0.8rem; color:var(--text2); }
+
+.mol-container { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; margin:1.5rem 0; }
+.mol-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; text-align:center; width:180px; }
+.mol-card canvas { border-radius:8px; margin-bottom:0.5rem; }
+.mol-card .mol-name { font-size:0.85rem; font-weight:500; }
+.mol-card .mol-smiles { font-size:0.7rem; color:var(--text2); font-family:monospace; word-break:break-all; }
+
+.viewer-3d { width:100%; height:420px; border-radius:var(--radius); border:1px solid var(--border); margin:1.5rem 0; position:relative; background:#000; }
+.viewer-label { position:absolute; bottom:1rem; left:1rem; z-index:5; background:rgba(0,0,0,0.75); padding:0.5rem 1rem; border-radius:8px; font-size:0.85rem; backdrop-filter:blur(4px); }
+.viewer-loading { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--text2); font-size:0.9rem; z-index:4; }
+
+.funnel { display:flex; flex-direction:column; align-items:center; margin:2rem 0; gap:0.25rem; }
+.funnel-level { display:flex; align-items:center; justify-content:center; height:50px; border-radius:8px; color:white; font-weight:600; font-size:0.9rem; }
+
+.admet-journey { display:flex; align-items:flex-start; gap:0; margin:2rem 0; overflow-x:auto; padding:1rem 0; }
+.journey-step { display:flex; flex-direction:column; align-items:center; min-width:120px; }
+.journey-icon { width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:0.5rem; border:2px solid var(--border); background:var(--bg2); }
+.journey-label { font-size:0.8rem; font-weight:600; text-align:center; }
+.journey-desc { font-size:0.7rem; color:var(--text2); text-align:center; max-width:100px; }
+.journey-connector { width:30px; height:2px; background:var(--border); margin-top:28px; flex-shrink:0; }
+
+.chart-container { width:100%; height:420px; margin:1.5rem 0; }
+
+.info-box { background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.2); border-radius:var(--radius); padding:1.25rem 1.5rem; margin:1.5rem 0; }
+.info-box.highlight { background:rgba(139,92,246,0.08); border-color:rgba(139,92,246,0.2); }
+.info-box-title { font-weight:600; margin-bottom:0.5rem; }
+
+.mmp-demo { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; margin:1.5rem 0; }
+.mmp-comparison { display:flex; align-items:center; justify-content:center; gap:2rem; flex-wrap:wrap; }
+.mmp-molecule { text-align:center; }
+.mmp-arrow-big { font-size:2rem; color:var(--accent); }
+.mmp-delta { display:inline-block; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem; font-weight:600; }
+.mmp-delta.positive { background:rgba(16,185,129,0.15); color:var(--green); }
+.mmp-delta.negative { background:rgba(239,68,68,0.15); color:var(--red); }
+.mmp-delta.neutral { background:rgba(148,163,184,0.15); color:var(--text2); }
+
+.stage-1 .stage-badge { background:rgba(59,130,246,0.15); color:#3b82f6; }
+.stage-2 .stage-badge { background:rgba(139,92,246,0.15); color:#8b5cf6; }
+.stage-3 .stage-badge { background:rgba(6,182,212,0.15); color:#06b6d4; }
+.stage-4 .stage-badge { background:rgba(16,185,129,0.15); color:#10b981; }
+.stage-5 .stage-badge { background:rgba(245,158,11,0.15); color:#f59e0b; }
+.stage-6 .stage-badge { background:rgba(236,72,153,0.15); color:#ec4899; }
+
+.footer { text-align:center; padding:3rem 2rem; color:var(--text2); font-size:0.85rem; border-top:1px solid var(--border); }
+
+.timeline { position:relative; padding-left:2rem; margin:1.5rem 0; }
+.timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background:var(--border); }
+.timeline-item { position:relative; margin-bottom:1.5rem; }
+.timeline-item::before { content:''; position:absolute; left:-2rem; top:0.5rem; width:12px; height:12px; border-radius:50%; border:2px solid var(--accent); background:var(--bg); z-index:1; }
+.timeline-item.done::before { background:var(--accent); }
+.timeline-time { font-size:0.8rem; color:var(--accent); font-weight:600; }
+.timeline-content { font-size:0.95rem; }
+
+@media (max-width:768px) {
+  .pipeline-flow { gap:0.25rem; }
+  .pipeline-arrow { width:20px; }
+  .pipeline-icon { width:48px; height:48px; font-size:1.2rem; }
+  .pipeline-label { font-size:0.65rem; max-width:60px; }
+  .section { padding:3rem 1rem; }
+  .nav-links a { font-size:0.7rem; padding:0.3rem 0.5rem; }
+  .viewer-3d { height:300px; }
+}
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav class="nav">
+  <div class="nav-logo">AIDD Pipeline</div>
+  <div class="nav-links">
+    <a href="#hero">Overview</a>
+    <a href="#stage1">1.靶点发现</a>
+    <a href="#stage2">2.分子生成</a>
+    <a href="#stage3">3.虚拟筛选</a>
+    <a href="#stage4">4.先导优化</a>
+    <a href="#stage5">5.ADMET</a>
+    <a href="#stage6">6.临床试验</a>
+    <a href="#tools">工具汇总</a>
+    <a href="#demo">Demo定位</a>
+  </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="hero">
+  <h1>AI 驱动的药物发现</h1>
+  <p class="subtitle">从疾病靶点到临床试验——全链路 6 大环节深度解析<br>以<strong>特发性肺纤维化 (IPF)</strong> 和全球首个 AI 药物 <strong>ISM001-055</strong> 为案例贯穿全程</p>
+
+  <div class="pipeline-flow" id="pipelineFlow">
+    <div class="pipeline-node active" onclick="scrollToSection('stage1')" data-aos="fade-up" data-aos-delay="100">
+      <div class="pipeline-icon" style="border-color:#3b82f6; box-shadow:0 0 15px rgba(59,130,246,0.3)">&#x1F3AF;</div>
+      <div class="pipeline-label">靶点发现</div>
+    </div>
+    <div class="pipeline-arrow active" style="background:#3b82f6" data-aos="fade-right" data-aos-delay="200"></div>
+    <div class="pipeline-node" onclick="scrollToSection('stage2')" data-aos="fade-up" data-aos-delay="300">
+      <div class="pipeline-icon">&#x1F9EA;</div>
+      <div class="pipeline-label">分子生成</div>
+    </div>
+    <div class="pipeline-arrow" data-aos="fade-right" data-aos-delay="400"></div>
+    <div class="pipeline-node" onclick="scrollToSection('stage3')" data-aos="fade-up" data-aos-delay="500">
+      <div class="pipeline-icon">&#x1F50D;</div>
+      <div class="pipeline-label">虚拟筛选</div>
+    </div>
+    <div class="pipeline-arrow" data-aos="fade-right" data-aos-delay="600"></div>
+    <div class="pipeline-node" onclick="scrollToSection('stage4')" data-aos="fade-up" data-aos-delay="700">
+      <div class="pipeline-icon">&#x2699;</div>
+      <div class="pipeline-label">先导优化</div>
+    </div>
+    <div class="pipeline-arrow" data-aos="fade-right" data-aos-delay="800"></div>
+    <div class="pipeline-node" onclick="scrollToSection('stage5')" data-aos="fade-up" data-aos-delay="900">
+      <div class="pipeline-icon">&#x1F4CA;</div>
+      <div class="pipeline-label">ADMET</div>
+    </div>
+    <div class="pipeline-arrow" data-aos="fade-right" data-aos-delay="1000"></div>
+    <div class="pipeline-node" onclick="scrollToSection('stage6')" data-aos="fade-up" data-aos-delay="1100">
+      <div class="pipeline-icon">&#x1F3E5;</div>
+      <div class="pipeline-label">临床试验</div>
+    </div>
+  </div>
+
+  <div class="info-box" style="max-width:700px; margin-top:2rem" data-aos="fade-up" data-aos-delay="1200">
+    <p style="text-align:center">
+      传统新药研发：<strong>10-15 年</strong>、<strong>26 亿美元</strong>、成功率 <strong>&lt;10%</strong><br>
+      AI 驱动（ISM001-055 案例）：靶点到 Phase I 仅 <strong>18 个月</strong>，成本降低 <strong>~70%</strong>
+    </p>
+  </div>
+
+  <!-- Case Study Introduction -->
+  <div class="case-study" style="max-width:800px; margin-top:2rem" data-aos="fade-up" data-aos-delay="1400">
+    <div class="case-study-title">贯穿案例：ISM001-055 —— 全球首个 AI 全流程发现的临床药物</div>
+    <p><strong>疾病</strong>：特发性肺纤维化（IPF）—— 一种致命的肺部疾病，肺组织逐渐瘢痕化，5 年生存率仅 20-40%，现有药物只能延缓而非逆转</p>
+    <p><strong>公司</strong>：Insilico Medicine（英矽智能）</p>
+    <p><strong>成就</strong>：用 AI 发现了一个<strong>全新靶点 TNIK</strong>（之前没人知道它和肺纤维化有关），并生成了全新的小分子药物 ISM001-055，从零到进入人体临床试验仅 18 个月，2024 年进入 Phase IIa</p>
+    <p style="margin-top:0.5rem; color:var(--text2)">以下每个章节都会展示这个药物在该阶段的真实经历 &#x1F447;</p>
+  </div>
+</section>
+
+<!-- ==================== STAGE 1 ==================== -->
+<section class="section stage-1" id="stage1">
+  <div class="section-header" data-aos="fade-up">
+    <div class="stage-badge">Stage 1 / 6</div>
+    <h2>靶点发现 <span class="en">Target Discovery</span></h2>
+    <p class="section-summary">从疾病出发，找到导致疾病的关键蛋白质（靶点），整条链路的起点</p>
+  </div>
+
+  <h3>这个环节在做什么？</h3>
+  <p>靶点（Target）是指与疾病密切相关的生物大分子，通常是蛋白质。找到正确的靶点意味着药物有了明确的"攻击目标"。<strong>选错靶点 = 后续所有投入归零</strong>，这是整条链路中最关键的决策。</p>
+
+  <div class="flow-diagram" data-aos="fade-up">
+    <div class="flow-box" style="background:rgba(59,130,246,0.2); border:1px solid rgba(59,130,246,0.4)">疾病（如 IPF）</div>
+    <div class="flow-arrow-right">&rarr;</div>
+    <div class="flow-box" style="background:rgba(139,92,246,0.2); border:1px solid rgba(139,92,246,0.4)">多组学数据挖掘<br><small>基因组/转录组/蛋白质组</small></div>
+    <div class="flow-arrow-right">&rarr;</div>
+    <div class="flow-box" style="background:rgba(6,182,212,0.2); border:1px solid rgba(6,182,212,0.4)">AI 分析<br><small>知识图谱 + NLP + 因果推理</small></div>
+    <div class="flow-arrow-right">&rarr;</div>
+    <div class="flow-box" style="background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.4)">候选靶点列表<br><small>按置信度排序</small></div>
+  </div>
+
+  <!-- Case Study -->
+  <div class="case-study" data-aos="fade-up">
+    <div class="case-study-title">ISM001-055 在此阶段的真实经历</div>
+    <p>Insilico Medicine 使用 <strong>PandaOmics</strong> 平台分析了 IPF 患者的多组学数据（基因表达、蛋白质组、临床数据），从 500 万+样本和 3000 万+论文中搜索。</p>
+    <p style="margin-top:0.5rem">AI 给出了 <strong>28 个候选靶点</strong>，其中排名最高的是 <strong>TNIK</strong>（TRAF2 and NCK-interacting protein kinase）。关键发现：<strong>TNIK 此前从未被报道与肺纤维化相关</strong>——这是纯粹的 AI 发现，人类专家从未想到过这个靶点。</p>
+    <p style="margin-top:0.5rem">后续实验验证：TNIK 确实在纤维化肺组织中高表达，在果蝇模型中 <strong>64% 的候选靶点得到实验验证</strong>。</p>
+    <p style="margin-top:0.5rem; color:var(--orange)">耗时：<strong>~3 周</strong>（传统方法需要 2-5 年）</p>
+  </div>
+
+  <h3>AI 技术解析</h3>
+  <div class="tech-grid" data-aos="fade-up">
+    <div class="tech-card"><div class="icon">&#x1F578;</div><div class="name">知识图谱</div><div class="desc">将基因、疾病、通路、药物连成网络，发现隐藏关联</div></div>
+    <div class="tech-card"><div class="icon">&#x1F4DA;</div><div class="name">NLP 文献挖掘</div><div class="desc">从 3000 万+论文和专利中提取基因-疾病关系</div></div>
+    <div class="tech-card"><div class="icon">&#x1F9EC;</div><div class="name">多组学整合</div><div class="desc">融合基因表达、甲基化、蛋白质组等多维数据</div></div>
+    <div class="tech-card"><div class="icon">&#x1F500;</div><div class="name">因果推理</div><div class="desc">区分"致病基因"和"旁观者基因"</div></div>
+  </div>
+
+  <h3>平台/产品对比</h3>
+  <div style="overflow-x:auto" data-aos="fade-up">
+    <table class="comparison-table">
+      <thead><tr><th>平台</th><th>公司</th><th>核心技术</th><th>差异化优势</th><th>定价</th></tr></thead>
+      <tbody>
+        <tr><td><strong><a href="https://pharma.ai/pandaomics" target="_blank">PandaOmics</a></strong></td><td>Insilico Medicine</td><td>60+ ML 模型，500万组学样本，3000万论文</td><td>与 Chemistry42 打通端到端；ChatPandaGPT 交互查询</td><td><span class="tag tag-commercial">商业 SaaS</span></td></tr>
+        <tr><td><strong><a href="https://platform.opentargets.org/" target="_blank">Open Targets</a></strong></td><td>EMBL-EBI / Sanger / GSK</td><td>遗传学+基因组学+转录组学证据整合</td><td>完全开放；遗传证据评分体系最强</td><td><span class="tag tag-free">免费开源</span></td></tr>
+        <tr><td><strong><a href="https://disgenet.com/" target="_blank">DisGeNET</a></strong></td><td>MedBioinformatics</td><td>NLP 处理 3000 万+论文</td><td>覆盖 91% FDA 批准药物靶点</td><td><span class="tag tag-freemium">免费增值</span></td></tr>
+        <tr><td><strong><a href="https://www.benevolent.com/" target="_blank">Benevolent Platform</a></strong></td><td>BenevolentAI</td><td>生物医学知识图谱 + ML 推理</td><td>几天内发现 baricitinib 治 COVID-19</td><td><span class="tag tag-commercial">合作授权</span></td></tr>
+        <tr><td><strong><a href="https://healx.ai/" target="_blank">Healx</a></strong></td><td>Healx</td><td>多组学特征反转 + 化学感知 LLM</td><td>专注罕见病；93% 组合成功率</td><td><span class="tag tag-commercial">合作授权</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box" data-aos="fade-up">
+    <div class="info-box-title">本质差异</div>
+    <p><strong>PandaOmics</strong> 胜在端到端整合；<strong>Open Targets</strong> 胜在开放性和遗传学深度；<strong>BenevolentAI</strong> 胜在知识图谱推理发现隐藏关联；<strong>Healx</strong> 独占罕见病赛道。</p>
+  </div>
+
+  <h3>靶点蛋白 3D 可视化</h3>
+  <p>TNIK 激酶域 3D 结构（PDB: 2X7F）——ISM001-055 攻击的靶点蛋白。拖动旋转，滚轮缩放。</p>
+  <div class="viewer-3d" id="proteinViewer" data-aos="fade-up">
+    <div class="viewer-loading" id="viewerLoading">&#x23F3; 正在加载 3D 蛋白质结构...</div>
+    <div class="viewer-label">TNIK Kinase Domain (PDB: 2X7F) | IPF 药物靶点</div>
+  </div>
+</section>
+
+<!-- ==================== STAGE 2 ==================== -->
+<section class="section stage-2" id="stage2">
+  <div class="section-header" data-aos="fade-up">
+    <div class="stage-badge">Stage 2 / 6</div>
+    <h2>分子生成/设计 <span class="en">Molecule Generation</span></h2>
+    <p class="section-summary">找到靶点后，AI 从零"发明"能与靶点结合的全新化合物分子</p>
+  </div>
+
+  <h3>这个环节在做什么？</h3>
+  <p>靶点确定后，需要找到能与之结合的"钥匙"——小分子化合物。传统方法靠化学家手动设计，每个分子需数天。AI 生成式模型可以在几小时内产出数千个候选分子。</p>
+
+  <div class="flow-diagram" data-aos="fade-up">
+    <div class="flow-box" style="background:rgba(139,92,246,0.2); border:1px solid rgba(139,92,246,0.4)">TNIK 蛋白结构</div>
+    <div class="flow-arrow-right">&rarr;</div>
+    <div class="flow-box" style="background:rgba(236,72,153,0.2); border:1px solid rgba(236,72,153,0.4)">生成式 AI<br><small>GAN / VAE / RL</small></div>
+    <div class="flow-arrow-right">&rarr;</div>
+    <div class="flow-box" style="background:rgba(59,130,246,0.2); border:1px solid rgba(59,130,246,0.4)">数千个新分子<br><small>SMILES / 3D 构象</small></div>
+    <div class="flow-arrow-right">&rarr;</div>
+    <div class="flow-box" style="background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.4)">初步筛选<br><small>类药性/可合成性</small></div>
+  </div>
+
+  <div class="case-study" data-aos="fade-up">
+    <div class="case-study-title">ISM001-055 在此阶段的真实经历</div>
+    <p>确认 TNIK 为靶点后，Insilico 启动 <strong>Chemistry42</strong> 平台，同时运行 <strong>40+ 并行生成模型</strong>（包括 GAN、VAE、强化学习、Transformer 等），针对 TNIK 激酶口袋生成分子。</p>
+    <p style="margin-top:0.5rem">系统在几天内产出 <strong>数千个候选分子</strong>，经过初步过滤（类药性、合成可行性、选择性预测）后，缩减到 <strong>~70 个</strong> 高优先级候选。</p>
+    <p style="margin-top:0.5rem; color:var(--orange)">耗时：<strong>~1 周</strong>（传统方法需要数月到一年）</p>
+  </div>
+
+  <h3>AI 技术解析</h3>
+  <div class="tech-grid" data-aos="fade-up">
+    <div class="tech-card"><div class="icon">&#x1F3B0;</div><div class="name">GAN 生成对抗网络</div><div class="desc">生成器 vs 判别器对抗训练，产出"以假乱真"的分子</div></div>
+    <div class="tech-card"><div class="icon">&#x1F300;</div><div class="name">VAE 变分自编码器</div><div class="desc">学习分子的连续潜空间，进行插值和优化</div></div>
+    <div class="tech-card"><div class="icon">&#x2601;</div><div class="name">扩散模型</div><div class="desc">从噪声逐步"去噪"生成 3D 分子构象</div></div>
+    <div class="tech-card"><div class="icon">&#x1F3AE;</div><div class="name">强化学习</div><div class="desc">多目标奖励函数（药效+毒性+可合成性），搜索最优分子</div></div>
+    <div class="tech-card"><div class="icon">&#x1F916;</div><div class="name">Transformer / GPT</div><div class="desc">将 SMILES 当"语言"，自回归生成分子"句子"</div></div>
+  </div>
+
+  <h3>平台/产品对比</h3>
+  <div style="overflow-x:auto" data-aos="fade-up">
+    <table class="comparison-table">
+      <thead><tr><th>平台</th><th>开发者</th><th>核心技术</th><th>差异化</th><th>定价</th></tr></thead>
+      <tbody>
+        <tr><td><strong><a href="https://pharma.ai/chemistry42" target="_blank">Chemistry42</a></strong></td><td>Insilico Medicine</td><td>40+ 并行生成模型 + 多智能体 RL + 逆合成预测</td><td>全流程整合；最快 1 周找到先导化合物</td><td><span class="tag tag-commercial">商业 SaaS</span></td></tr>
+        <tr><td><strong><a href="https://github.com/MolecularAI/REINVENT4" target="_blank">REINVENT 4</a></strong></td><td>AstraZeneca</td><td>RNN + Transformer + RL 打分</td><td>开源成熟；学术界标准工具</td><td><span class="tag tag-opensource">开源免费</span></td></tr>
+        <tr><td><strong><a href="https://github.com/LIYUESEN/druggpt" target="_blank">DrugGPT</a></strong></td><td>学术团队</td><td>GPT 解码器，以蛋白序列为条件</td><td>不需要 3D 结构，直接从序列生成</td><td><span class="tag tag-opensource">开源免费</span></td></tr>
+        <tr><td><strong><a href="https://github.com/insilicomedicine/GENTRL" target="_blank">GENTRL</a></strong></td><td>Insilico Medicine</td><td>VAE + RL + 张量分解</td><td>里程碑：21 天完成 DDR1 激酶湿实验验证</td><td><span class="tag tag-opensource">开源免费</span></td></tr>
+        <tr><td><strong><a href="https://github.com/BenevolentAI/guacamol" target="_blank">GuacaMol</a></strong></td><td>BenevolentAI</td><td>基准测试框架</td><td>不是生成器，而是评估生成器好坏的"标准考试"</td><td><span class="tag tag-opensource">开源免费</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>分子的"语言"：SMILES</h3>
+  <p>AI 用一种叫 SMILES 的文本编码来表示分子结构——就像用字母写出分子的"句子"：</p>
+  <div class="mol-container" data-aos="fade-up">
+    <div class="mol-card">
+      <canvas id="mol1" width="150" height="150"></canvas>
+      <div class="mol-name">阿司匹林</div>
+      <div class="mol-smiles">CC(=O)Oc1ccccc1C(=O)O</div>
+    </div>
+    <div class="mol-card">
+      <canvas id="mol2" width="150" height="150"></canvas>
+      <div class="mol-name">对乙酰氨基酚</div>
+      <div class="mol-smiles">CC(=O)Nc1ccc(O)cc1</div>
+    </div>
+    <div class="mol-card">
+      <canvas id="mol3" width="150" height="150"></canvas>
+      <div class="mol-name">布洛芬</div>
+      <div class="mol-smiles">CC(C)Cc1ccc(cc1)C(C)C(=O)O</div>
+    </div>
+    <div class="mol-card">
+      <canvas id="mol4" width="150" height="150"></canvas>
+      <div class="mol-name">水杨酸</div>
+      <div class="mol-smiles">O=C(O)c1ccccc1O</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== STAGE 3 ==================== -->
+<section class="section stage-3" id="stage3">
+  <div class="section-header" data-aos="fade-up">
+    <div class="stage-badge">Stage 3 / 6</div>
+    <h2>虚拟筛选 <span class="en">Virtual Screening</span></h2>
+    <p class="section-summary">从海量候选分子中，快速筛出最可能与靶点结合的</p>
+  </div>
+
+  <h3>这个环节在做什么？</h3>
+  <p>分子生成产出了数千个候选，但不可能全部合成测试。虚拟筛选用计算模拟预测每个分子与靶点蛋白的结合能力，筛出最有希望的少数。</p>
+
+  <div class="funnel" data-aos="fade-up">
+    <div class="funnel-level" style="width:90%; background:linear-gradient(90deg,rgba(59,130,246,0.3),rgba(59,130,246,0.5))">AI 生成 + 化合物库：数千~数十亿分子</div>
+    <div class="funnel-level" style="width:70%; background:linear-gradient(90deg,rgba(139,92,246,0.3),rgba(139,92,246,0.5))">AI 初筛（类药性/相似性）：~100 万</div>
+    <div class="funnel-level" style="width:50%; background:linear-gradient(90deg,rgba(6,182,212,0.3),rgba(6,182,212,0.5))">分子对接 Docking：~1,000</div>
+    <div class="funnel-level" style="width:30%; background:linear-gradient(90deg,rgba(16,185,129,0.3),rgba(16,185,129,0.5))">精确评估 FEP/MD：~50</div>
+    <div class="funnel-level" style="width:15%; background:linear-gradient(90deg,rgba(245,158,11,0.4),rgba(245,158,11,0.6))">实验验证候选：5-10 个</div>
+  </div>
+
+  <div class="case-study" data-aos="fade-up">
+    <div class="case-study-title">ISM001-055 在此阶段的真实经历</div>
+    <p>Chemistry42 生成的 ~70 个高优先级分子，经过虚拟筛选评估：</p>
+    <ul style="margin:0.5rem 0 0 1.5rem; color:var(--text2)">
+      <li>分子对接：评估与 TNIK 激酶口袋的结合构象和亲和力</li>
+      <li>选择性筛选：确保不会误伤其他激酶（选择性 >100x）</li>
+      <li>ADMET 初筛：剔除明显有毒或不可吸收的候选</li>
+      <li>合成可行性评估：确保分子能在实验室中合成</li>
+    </ul>
+    <p style="margin-top:0.5rem">最终 <strong>~10 个候选分子</strong> 进入合成和实验验证。</p>
+    <p style="color:var(--orange)">耗时：<strong>~2 周</strong></p>
+  </div>
+
+  <h3>传统方法 vs AI 方法</h3>
+  <div style="overflow-x:auto" data-aos="fade-up">
+    <table class="comparison-table">
+      <thead><tr><th>维度</th><th>传统物理方法</th><th>AI 驱动方法</th><th>混合方法（最优）</th></tr></thead>
+      <tbody>
+        <tr><td><strong>代表</strong></td><td>AutoDock Vina, Glide</td><td>DiffDock, GNINA</td><td>AI 初筛 + 物理精确评估</td></tr>
+        <tr><td><strong>速度</strong></td><td>每分子数分钟</td><td>每分子数秒</td><td>分层加速</td></tr>
+        <tr><td><strong>准确度</strong></td><td>稳定，可解释</td><td>部分场景更优，泛化性存疑</td><td>最佳（+110%）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>平台/产品对比</h3>
+  <div style="overflow-x:auto" data-aos="fade-up">
+    <table class="comparison-table">
+      <thead><tr><th>平台</th><th>方法</th><th>差异化</th><th>定价</th></tr></thead>
+      <tbody>
+        <tr><td><strong><a href="https://www.atomwise.com/" target="_blank">AtomNet</a></strong></td><td>3D 原子环境深度 CNN</td><td>318 靶点 73-75% 命中率；最大商业筛选平台</td><td><span class="tag tag-commercial">合作授权</span></td></tr>
+        <tr><td><strong><a href="https://github.com/gcorso/DiffDock" target="_blank">DiffDock</a></strong></td><td>扩散模型生成结合构象</td><td>无需传统搜索；前沿方法</td><td><span class="tag tag-opensource">开源免费</span></td></tr>
+        <tr><td><strong><a href="https://vina.scripps.edu/" target="_blank">AutoDock Vina</a></strong></td><td>经验打分 + 局部搜索</td><td>免费可靠；25 年学术验证</td><td><span class="tag tag-free">免费开源</span></td></tr>
+        <tr><td><strong><a href="https://www.schrodinger.com/platform/products/glide/" target="_blank">Glide</a></strong></td><td>多级过滤 + 精确打分</td><td>92% 自对接准确率；工业金标准</td><td><span class="tag tag-commercial">商业授权</span></td></tr>
+        <tr><td><strong><a href="https://github.com/gnina/gnina" target="_blank">GNINA</a></strong></td><td>Vina 采样 + CNN 重打分</td><td>物理+AI 混合最佳平衡；免费</td><td><span class="tag tag-opensource">开源免费</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>蛋白质-配体对接 3D 可视化</h3>
+  <p>下方展示 EGFR 激酶与小分子抑制剂 Erlotinib 的对接复合物（PDB: 1M17）。小分子"嵌入"蛋白质口袋中，就像钥匙插入锁孔。</p>
+  <div class="viewer-3d" id="dockingViewer" data-aos="fade-up">
+    <div class="viewer-loading" id="dockingLoading">&#x23F3; 正在加载蛋白质-配体复合物...</div>
+    <div class="viewer-label">EGFR + Erlotinib (PDB: 1M17) | 蛋白质-药物对接示例</div>
+  </div>
+</section>
+
+<!-- ==================== STAGE 4 ==================== -->
+<section class="section stage-4" id="stage4">
+  <div class="section-header" data-aos="fade-up">
+    <div class="stage-badge">Stage 4 / 6</div>
+    <h2>先导化合物优化 <span class="en">Lead Optimization</span></h2>
+    <p class="section-summary">把"还行"的候选分子改造成"很好"的药物候选——药化专家花时间最多的环节</p>
+  </div>
+
+  <h3>这个环节在做什么？</h3>
+  <p>初始命中分子通常还不够好——可能药效不够强、毒性偏高、溶解度差。先导优化就是在保持药效的前提下，反复微调分子结构来改善这些问题。</p>
+  <p style="margin-top:0.5rem">这是一个 <strong>DMTA 循环</strong>：设计（Design）&rarr; 合成（Make）&rarr; 测试（Test）&rarr; 分析（Analyze），每轮传统上需 4-6 周，AI 可压缩到数小时。</p>
+
+  <div class="case-study" data-aos="fade-up">
+    <div class="case-study-title">ISM001-055 在此阶段的真实经历</div>
+    <p>实验验证确认了数个 TNIK 抑制剂命中分子后，团队进入优化循环：</p>
+    <div class="timeline" style="margin-top:1rem">
+      <div class="timeline-item done"><div class="timeline-time">第 1-2 轮 DMTA</div><div class="timeline-content">优化 TNIK 结合亲和力（IC50 从 μM 级降到 nM 级）</div></div>
+      <div class="timeline-item done"><div class="timeline-time">第 3-4 轮 DMTA</div><div class="timeline-content">改善选择性——确保不抑制其他激酶（选择性 >100x）</div></div>
+      <div class="timeline-item done"><div class="timeline-time">第 5-6 轮 DMTA</div><div class="timeline-content">优化 ADMET：提升口服生物利用度、降低 hERG 心脏毒性风险</div></div>
+      <div class="timeline-item done"><div class="timeline-time">第 7 轮</div><div class="timeline-content">确定临床前候选分子 ISM001-055，各项指标达标</div></div>
+    </div>
+    <p style="margin-top:0.5rem">Chemistry42 在每轮循环中提供候选分子设计方案，<strong>将 7 轮 DMTA 压缩到 ~2 个月</strong>（传统需要 1-2 年）。</p>
+    <p style="color:var(--orange)">累计耗时：<strong>~2 个月</strong></p>
+  </div>
+
+  <h3>AI 技术解析</h3>
+  <div class="tech-grid" data-aos="fade-up">
+    <div class="tech-card"><div class="icon">&#x1F578;</div><div class="name">图神经网络 (GNN)</div><div class="desc">分子视为图（原子=节点，键=边），预测属性变化</div></div>
+    <div class="tech-card"><div class="icon">&#x26A1;</div><div class="name">自由能微扰 (FEP)</div><div class="desc">物理+ML，精确预测结合亲和力（误差 <1 log unit）</div></div>
+    <div class="tech-card"><div class="icon">&#x1F50E;</div><div class="name">匹配分子对 (MMP)</div><div class="desc">从历史数据找"只改一个基团"的分子对，统计属性变化规律</div></div>
+    <div class="tech-card"><div class="icon">&#x1F3AF;</div><div class="name">多参数优化 (MPO)</div><div class="desc">同时平衡药效、毒性、溶解度等多个冲突目标</div></div>
+  </div>
+
+  <h3>平台/产品对比</h3>
+  <div style="overflow-x:auto" data-aos="fade-up">
+    <table class="comparison-table">
+      <thead><tr><th>平台</th><th>核心技术</th><th>差异化</th><th>定价</th></tr></thead>
+      <tbody>
+        <tr><td><strong><a href="https://www.schrodinger.com/platform/products/fep/" target="_blank">FEP+</a></strong></td><td>物理 FEP + ML + AutoDesigner</td><td>亲和力预测误差 <1 log unit；减少 30-60% 合成轮次</td><td><span class="tag tag-commercial">~$100K/年</span></td></tr>
+        <tr><td><strong><a href="https://optibrium.com/products/stardrop/" target="_blank">StarDrop</a></strong></td><td>QSAR + Cerella 深度学习 + MPO</td><td>"Glowing Molecule"高亮子结构；50% Top 药企使用</td><td><span class="tag tag-commercial">~$10K/年</span></td></tr>
+        <tr><td><strong><a href="https://github.com/deepchem/deepchem" target="_blank">DeepChem</a></strong></td><td>GraphConv, MPNN, Transformer</td><td>开源；端到端 ML pipeline</td><td><span class="tag tag-opensource">开源免费</span></td></tr>
+        <tr><td><strong><a href="https://github.com/Merck/matcher" target="_blank">Merck Matcher</a></strong></td><td>匹配分子对分析 Web 应用</td><td>MMP 可视化行业最佳；化学上下文精细搜索</td><td><span class="tag tag-opensource">开源免费</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>MMP 分析演示</h3>
+  <div class="mmp-demo" data-aos="fade-up">
+    <p style="margin-bottom:1.5rem; color:var(--text2)">匹配分子对（MMP）：两个分子只有一个基团不同。对比实验数据，就能知道"这个改动带来了什么"：</p>
+    <div class="mmp-comparison">
+      <div class="mmp-molecule">
+        <canvas id="mmpA" width="150" height="150" style="border-radius:8px"></canvas>
+        <div style="margin-top:0.5rem; font-weight:600">分子 A（含 Cl）</div>
+      </div>
+      <div class="mmp-arrow-big">&rarr;</div>
+      <div class="mmp-molecule">
+        <canvas id="mmpB" width="150" height="150" style="border-radius:8px"></canvas>
+        <div style="margin-top:0.5rem; font-weight:600">分子 B（Cl&rarr;F）</div>
+      </div>
+    </div>
+    <div style="margin-top:1.5rem">
+      <p style="font-weight:600; margin-bottom:0.75rem">ChEMBL 中 2,847 个类似替换的统计结果：</p>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap">
+        <div>代谢稳定性: <span class="mmp-delta positive">&uarr; +23%</span></div>
+        <div>脂溶性 (logP): <span class="mmp-delta positive">&darr; -0.3</span></div>
+        <div>肝毒性: <span class="mmp-delta positive">&darr; -15%</span></div>
+        <div>药效: <span class="mmp-delta neutral">&harr; 不变</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== STAGE 5 ==================== -->
+<section class="section stage-5" id="stage5">
+  <div class="section-header" data-aos="fade-up">
+    <div class="stage-badge">Stage 5 / 6 &#x2B50;</div>
+    <h2>ADMET 预测 <span class="en">ADMET Prediction</span></h2>
+    <p class="section-summary">药物的"体检报告"——预测在人体内的吸收、分布、代谢、排泄和毒性</p>
+  </div>
+
+  <h3>这个环节在做什么？</h3>
+  <p>分子能和靶点结合，不代表能成为药。它需要通过"体检"——能被吸收吗？能到达病灶吗？被肝脏分解得多快？有没有毒？<strong>40-60% 的临床失败是因为 ADMET 问题</strong>。</p>
+
+  <div class="case-study" data-aos="fade-up">
+    <div class="case-study-title">ISM001-055 在此阶段的真实经历</div>
+    <p>在优化过程中，ISM001-055 的 ADMET 属性被反复预测和实验验证：</p>
+    <ul style="margin:0.5rem 0 0 1.5rem">
+      <li><strong>吸收</strong>：口服生物利用度 >50%，可以做成口服药片</li>
+      <li><strong>分布</strong>：在肺组织中有良好分布（关键——因为治疗肺部疾病）</li>
+      <li><strong>代谢</strong>：半衰期适中，支持每日一次给药</li>
+      <li><strong>毒性</strong>：hERG 心脏毒性风险低；无 AMES 致突变性；肝毒性可接受</li>
+    </ul>
+    <p style="margin-top:0.5rem">AI 预测结果与后续动物实验数据<strong>高度一致</strong>，验证了计算预测的可靠性。</p>
+  </div>
+
+  <h3>药物在人体内的旅程</h3>
+  <div class="admet-journey" data-aos="fade-up">
+    <div class="journey-step">
+      <div class="journey-icon" style="border-color:#3b82f6; background:rgba(59,130,246,0.1)">&#x1F48A;</div>
+      <div class="journey-label" style="color:#3b82f6">口服</div>
+      <div class="journey-desc">药片进入胃</div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-icon" style="border-color:#8b5cf6; background:rgba(139,92,246,0.1)">&#x1F4A7;</div>
+      <div class="journey-label" style="color:#8b5cf6">A 吸收</div>
+      <div class="journey-desc">穿过肠壁进入血液</div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-icon" style="border-color:#06b6d4; background:rgba(6,182,212,0.1)">&#x1FA78;</div>
+      <div class="journey-label" style="color:#06b6d4">D 分布</div>
+      <div class="journey-desc">随血液到达肺部</div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-icon" style="border-color:#10b981; background:rgba(16,185,129,0.1)">&#x1FAC0;</div>
+      <div class="journey-label" style="color:#10b981">M 代谢</div>
+      <div class="journey-desc">肝脏 CYP450 分解</div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-icon" style="border-color:#f59e0b; background:rgba(245,158,11,0.1)">&#x1F4A7;</div>
+      <div class="journey-label" style="color:#f59e0b">E 排泄</div>
+      <div class="journey-desc">代谢物经肾排出</div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-icon" style="border-color:#ef4444; background:rgba(239,68,68,0.1)">&#x26A0;</div>
+      <div class="journey-label" style="color:#ef4444">T 毒性</div>
+      <div class="journey-desc">全程监测器官毒性</div>
+    </div>
+  </div>
+
+  <h3>五大属性详解</h3>
+  <div class="card" data-aos="fade-up" style="border-left:3px solid #3b82f6"><div class="card-title" style="color:#3b82f6">A — 吸收 (Absorption)</div><p>药吃进去能被身体吸收多少？</p><p style="margin-top:0.3rem; color:var(--text2); font-size:0.9rem">核心指标：口服生物利用度（F%）、Caco-2 渗透性、P-gp 底物、水溶性（logS）</p></div>
+  <div class="card" data-aos="fade-up" style="border-left:3px solid #8b5cf6"><div class="card-title" style="color:#8b5cf6">D — 分布 (Distribution)</div><p>药物能到达目标器官吗？</p><p style="margin-top:0.3rem; color:var(--text2); font-size:0.9rem">核心指标：血脑屏障穿透（BBB）、血浆蛋白结合率（PPB）、分布容积（VDss）</p></div>
+  <div class="card" data-aos="fade-up" style="border-left:3px solid #10b981"><div class="card-title" style="color:#10b981">M — 代谢 (Metabolism)</div><p>肝脏多快分解？会和其他药冲突吗？</p><p style="margin-top:0.3rem; color:var(--text2); font-size:0.9rem">核心指标：CYP450 抑制/底物（1A2, 2C9, 2D6, 3A4）、微粒体稳定性</p></div>
+  <div class="card" data-aos="fade-up" style="border-left:3px solid #f59e0b"><div class="card-title" style="color:#f59e0b">E — 排泄 (Excretion)</div><p>多久排出体外？需要多久吃一次？</p><p style="margin-top:0.3rem; color:var(--text2); font-size:0.9rem">核心指标：半衰期（T1/2）、清除率（CLp）、平均驻留时间（MRT）</p></div>
+  <div class="card" data-aos="fade-up" style="border-left:3px solid #ef4444"><div class="card-title" style="color:#ef4444">T — 毒性 (Toxicity)</div><p>安全吗？会伤害重要器官吗？</p><p style="margin-top:0.3rem; color:var(--text2); font-size:0.9rem">核心指标：hERG 心脏毒性、AMES 致突变、肝毒性（DILI）、LD50</p></div>
+
+  <h3>平台/产品对比</h3>
+  <div style="overflow-x:auto" data-aos="fade-up">
+    <table class="comparison-table">
+      <thead><tr><th>平台</th><th>端点数</th><th>差异化</th><th>定价</th></tr></thead>
+      <tbody>
+        <tr><td><strong><a href="https://admetlab3.scbdd.com" target="_blank">ADMETlab 3.0</a></strong></td><td>88+</td><td>综合精度最高；API 支持</td><td><span class="tag tag-free">免费</span></td></tr>
+        <tr><td><strong><a href="http://lmmd.ecust.edu.cn/admetsar3/" target="_blank">admetSAR 3.0</a></strong></td><td>119</td><td>端点最全；含 MMP 优化模块</td><td><span class="tag tag-free">免费</span></td></tr>
+        <tr><td><strong><a href="http://www.swissadme.ch/" target="_blank">SwissADME</a></strong></td><td>~30</td><td>UX 最佳（BOILED-Egg 图）</td><td><span class="tag tag-free">免费</span></td></tr>
+        <tr><td><strong><a href="https://admet.ai.greenstonebio.com/" target="_blank">ADMET-AI</a></strong></td><td>~40</td><td>最快；开源；对标 DrugBank</td><td><span class="tag tag-opensource">开源免费</span></td></tr>
+        <tr><td><strong><a href="https://www.nature.com/articles/s41596-023-00942-4" target="_blank">OptADMET</a></strong></td><td>32</td><td>唯一专注 MMP 驱动属性优化</td><td><span class="tag tag-free">免费</span></td></tr>
+        <tr><td><strong><a href="https://carbonsilicon.ai/products" target="_blank">DrugFlow</a></strong> (碳硅智慧)</td><td>76</td><td>全流程一体化；中国生态</td><td><span class="tag tag-commercial">商业</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>交互式 ADMET 属性对比</h3>
+  <p>三种常见药物的 ADMET 属性雷达图（预测值，0-1 归一化）：</p>
+  <div class="chart-container" id="admetRadar" data-aos="fade-up"></div>
+</section>
+
+<!-- ==================== STAGE 6 ==================== -->
+<section class="section stage-6" id="stage6">
+  <div class="section-header" data-aos="fade-up">
+    <div class="stage-badge">Stage 6 / 6</div>
+    <h2>临床试验设计 <span class="en">Clinical Trial Design</span></h2>
+    <p class="section-summary">AI 优化试验方案、预测患者分群——药物研发最烧钱的最后关卡</p>
+  </div>
+
+  <h3>这个环节在做什么？</h3>
+  <p>临床试验分三期：Phase I（安全性，几十人）、Phase II（有效性，几百人）、Phase III（大规模验证，数千人）。一个 Phase III 可花 1-3 亿美元，耗时 3-7 年。</p>
+
+  <div class="case-study" data-aos="fade-up">
+    <div class="case-study-title">ISM001-055 在此阶段的真实经历</div>
+    <div class="timeline">
+      <div class="timeline-item done"><div class="timeline-time">2023 Q1 — Phase I</div><div class="timeline-content">在新西兰和中国完成 Phase I 健康志愿者试验，确认安全性和耐受性良好</div></div>
+      <div class="timeline-item done"><div class="timeline-time">2024 Q1 — Phase IIa</div><div class="timeline-content">在 IPF 患者中开始 Phase IIa，初步评估有效性</div></div>
+      <div class="timeline-item"><div class="timeline-time">进行中</div><div class="timeline-content">使用 <strong>inClinico</strong> 平台优化试验设计：患者入排标准、终点选择、样本量计算</div></div>
+    </div>
+    <p style="margin-top:1rem"><strong>全程时间线</strong>：靶点发现到 Phase I 入组 = <strong>18 个月</strong>（行业平均 4-6 年）</p>
+  </div>
+
+  <h3>AI 如何优化临床试验</h3>
+  <div class="tech-grid" data-aos="fade-up">
+    <div class="tech-card"><div class="icon">&#x1F465;</div><div class="name">患者分群</div><div class="desc">ML 找到最可能响应治疗的患者亚群</div></div>
+    <div class="tech-card"><div class="icon">&#x1F4C8;</div><div class="name">终点预测</div><div class="desc">预测疗效和疾病进展</div></div>
+    <div class="tech-card"><div class="icon">&#x1F3DB;</div><div class="name">试验优化</div><div class="desc">入排标准调优、试验中心选择</div></div>
+    <div class="tech-card"><div class="icon">&#x1F30D;</div><div class="name">数字孪生</div><div class="desc">虚拟对照组，减少真实患者人数</div></div>
+  </div>
+
+  <h3>平台/产品对比</h3>
+  <div style="overflow-x:auto" data-aos="fade-up">
+    <table class="comparison-table">
+      <thead><tr><th>平台</th><th>定位</th><th>差异化</th></tr></thead>
+      <tbody>
+        <tr><td><strong><a href="https://www.medidata.com/en/clinical-trial-products/medidata-ai/" target="_blank">Medidata AI</a></strong></td><td>端到端试验管理</td><td>全球最大临床试验数据集</td></tr>
+        <tr><td><strong><a href="https://www.unlearn.ai/" target="_blank">Unlearn.AI</a></strong></td><td>数字孪生</td><td>FDA/EMA 认可；入组减少 ~20%</td></tr>
+        <tr><td><strong><a href="https://www.tempus.com/" target="_blank">Tempus</a></strong></td><td>肿瘤精准匹配</td><td>350+ PB 临床+分子数据</td></tr>
+        <tr><td><strong><a href="https://www.saama.com/" target="_blank">Saama</a></strong></td><td>数据管理</td><td>参与 COVID 疫苗试验数据管理</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== COMPLETE TIMELINE ==================== -->
+<section class="section" id="timeline-full" style="background:var(--bg2); max-width:100%; border-radius:0; padding:4rem 2rem">
+  <div style="max-width:800px; margin:0 auto">
+    <h2 style="text-align:center; margin-bottom:2rem" data-aos="fade-up">ISM001-055 完整时间线</h2>
+    <div class="timeline" data-aos="fade-up">
+      <div class="timeline-item done"><div class="timeline-time">Month 0-1</div><div class="timeline-content"><strong>靶点发现</strong> — PandaOmics 从 500 万组学样本中发现全新靶点 TNIK</div></div>
+      <div class="timeline-item done"><div class="timeline-time">Month 1-2</div><div class="timeline-content"><strong>分子生成</strong> — Chemistry42 用 40+ 生成模型产出数千候选分子</div></div>
+      <div class="timeline-item done"><div class="timeline-time">Month 2-3</div><div class="timeline-content"><strong>虚拟筛选</strong> — 分子对接+ADMET 初筛，缩减到 ~10 个候选</div></div>
+      <div class="timeline-item done"><div class="timeline-time">Month 3-9</div><div class="timeline-content"><strong>先导优化</strong> — 7 轮 DMTA 循环，从 μM 优化到 nM 亲和力</div></div>
+      <div class="timeline-item done"><div class="timeline-time">Month 9-12</div><div class="timeline-content"><strong>ADMET + 临床前</strong> — 动物实验验证安全性和药效</div></div>
+      <div class="timeline-item done"><div class="timeline-time">Month 12-18</div><div class="timeline-content"><strong>IND 申报 + Phase I</strong> — 获批进入人体试验</div></div>
+      <div class="timeline-item done"><div class="timeline-time">2024 Q1</div><div class="timeline-content"><strong>Phase IIa</strong> — 在 IPF 患者中评估有效性，全球首个 AI 药物进入 Phase II</div></div>
+    </div>
+    <div class="info-box" style="margin-top:2rem; text-align:center" data-aos="fade-up">
+      <p><strong>18 个月</strong>完成传统需要 <strong>4-6 年</strong>的工作，成本降低约 <strong>70%</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TOOLS ==================== -->
+<section class="section" id="tools">
+  <div class="section-header" data-aos="fade-up">
+    <h2>跨阶段开源工具汇总</h2>
+    <p class="section-summary">搭建 AIDD 应用的"地基"</p>
+  </div>
+  <div style="overflow-x:auto" data-aos="fade-up">
+    <table class="comparison-table">
+      <thead><tr><th>工具</th><th>覆盖阶段</th><th>一句话</th></tr></thead>
+      <tbody>
+        <tr><td><strong><a href="https://www.rdkit.org/" target="_blank">RDKit</a></strong></td><td>全部</td><td>SMILES 解析、指纹计算、子结构搜索——AIDD 的"水和电"</td></tr>
+        <tr><td><strong><a href="https://github.com/deepchem/deepchem" target="_blank">DeepChem</a></strong></td><td>筛选/优化/ADMET</td><td>分子深度学习框架（GraphConv, MPNN, Transformer）</td></tr>
+        <tr><td><strong><a href="https://tdcommons.ai/" target="_blank">TDC</a></strong></td><td>全部（基准）</td><td>MIT 出品的 AI-ready 药物发现数据集和排行榜</td></tr>
+        <tr><td><strong><a href="https://pyg.org/" target="_blank">PyTorch Geometric</a></strong></td><td>优化/ADMET/筛选</td><td>图神经网络框架，分子图消息传递</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>全链路集成平台</h3>
+  <div class="card" data-aos="fade-up" style="border-left:3px solid var(--accent)"><div class="card-title"><a href="https://insilico.com/" target="_blank">Insilico Medicine — Pharma.AI</a></div><p>唯一覆盖"靶点发现 &rarr; 分子生成 &rarr; 临床预测"全链路的平台。ISM001-055 的缔造者。2026 年与 Eli Lilly 签约 27.5 亿美元。</p></div>
+  <div class="card" data-aos="fade-up" style="border-left:3px solid var(--accent2)"><div class="card-title"><a href="https://www.recursion.com/" target="_blank">Recursion — Recursion OS</a></div><p>表型组学+计算机视觉驱动，50+ PB 自有数据。2024 年收购 Exscientia，自有 BioHive-2 超算。</p></div>
+</section>
+
+<!-- ==================== DEMO ==================== -->
+<section class="section" id="demo">
+  <div class="section-header" data-aos="fade-up">
+    <h2>你的 Demo 定位</h2>
+    <p class="section-summary">ADMET 预测 + 数据驱动的结构探索引导</p>
+  </div>
+
+  <h3>在全链路中的位置</h3>
+  <div class="flow-diagram" data-aos="fade-up">
+    <div class="flow-box" style="opacity:0.4">靶点发现</div>
+    <div class="flow-arrow-right" style="opacity:0.3">&rarr;</div>
+    <div class="flow-box" style="opacity:0.4">分子生成</div>
+    <div class="flow-arrow-right" style="opacity:0.3">&rarr;</div>
+    <div class="flow-box" style="opacity:0.4">虚拟筛选</div>
+    <div class="flow-arrow-right">&rarr;</div>
+    <div class="flow-box" style="background:rgba(16,185,129,0.3); border:2px solid var(--green)">先导优化 &#x2B50;</div>
+    <div class="flow-arrow-right">&rarr;</div>
+    <div class="flow-box" style="background:rgba(245,158,11,0.3); border:2px solid var(--orange)">ADMET &#x2B50;</div>
+    <div class="flow-arrow-right" style="opacity:0.3">&rarr;</div>
+    <div class="flow-box" style="opacity:0.4">临床试验</div>
+  </div>
+
+  <div class="info-box highlight" data-aos="fade-up">
+    <div class="info-box-title">市场空白 = 你的机会</div>
+    <p>没有产品同时做到：好的 UX + 可靠 ADMET 预测 + MMP 数据驱动的结构探索。admetSAR 3.0 功能最接近但 UI 粗糙，StarDrop UX 最好但桌面端且无 MMP。</p>
+  </div>
+
+  <div class="card" data-aos="fade-up" style="border-left:3px solid var(--orange)">
+    <div class="card-title">产品定义：分子优化加速器</div>
+    <p style="margin-bottom:1rem; color:var(--text2)">核心原则：<strong>Build the telescope, not the oracle. 不给意见，给证据和选项。</strong></p>
+    <div style="display:grid; gap:0.75rem">
+      <div style="padding:1rem; background:var(--bg); border-radius:8px; border-left:3px solid #3b82f6"><strong style="color:#3b82f6">Layer 1 — ADMET 体检报告</strong><br>输入分子 &rarr; 秒出属性预测 + 不确定性量化 + 高亮问题区域</div>
+      <div style="padding:1rem; background:var(--bg); border-radius:8px; border-left:3px solid #8b5cf6"><strong style="color:#8b5cf6">Layer 2 — 数据驱动结构探索</strong><br>AI 列出 ChEMBL MMP 支持的修改选项 &rarr; 用户选择 &rarr; 即时预测属性变化</div>
+      <div style="padding:1rem; background:var(--bg); border-radius:8px; border-left:3px solid #10b981"><strong style="color:#10b981">Layer 3 — 风险预警</strong><br>自动标注 PAINS 片段、Michael 受体等结构警报</div>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  <p>AIDD Pipeline Report | 案例：Insilico Medicine ISM001-055 (IPF) | 2026-05-10</p>
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script src="https://unpkg.com/smiles-drawer@1.2.0/dist/smiles-drawer.min.js"></script>
+<script>
+AOS.init({ duration: 600, once: true, offset: 100 });
+
+// Scroll progress
+window.addEventListener('scroll', () => {
+  const p = (document.documentElement.scrollTop / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+  document.getElementById('scrollProgress').style.width = p + '%';
+});
+
+// Active nav
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  document.querySelectorAll('[id]').forEach(el => {
+    if (el.offsetTop - 200 <= window.pageYOffset) current = el.id;
+  });
+  navLinks.forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+  });
+});
+
+// Pipeline animation
+const stageColors = ['#3b82f6','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ec4899'];
+const stageIds = ['stage1','stage2','stage3','stage4','stage5','stage6'];
+const pNodes = document.querySelectorAll('.pipeline-node');
+const pArrows = document.querySelectorAll('.pipeline-arrow');
+window.addEventListener('scroll', () => {
+  let ai = 0;
+  stageIds.forEach((id, i) => { const el = document.getElementById(id); if (el && window.pageYOffset >= el.offsetTop - 300) ai = i; });
+  pNodes.forEach((n, i) => {
+    const icon = n.querySelector('.pipeline-icon');
+    if (i <= ai) { n.classList.add('active'); icon.style.borderColor = stageColors[i]; icon.style.boxShadow = '0 0 15px ' + stageColors[i] + '66'; }
+    else { n.classList.remove('active'); icon.style.borderColor = ''; icon.style.boxShadow = ''; }
+  });
+  pArrows.forEach((a, i) => {
+    if (i < ai) { a.classList.add('active'); a.style.background = stageColors[i]; a.querySelector && (a.style.cssText += '--arrow-color:' + stageColors[i]); }
+    else { a.classList.remove('active'); a.style.background = ''; }
+  });
+});
+
+function scrollToSection(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
+
+// === 3Dmol.js Viewers ===
+function initViewer(containerId, loadingId, pdbId, style) {
+  const container = document.getElementById(containerId);
+  const loading = document.getElementById(loadingId);
+  if (!container || container.dataset.loaded) return;
+  container.dataset.loaded = 'true';
+  try {
+    const viewer = $3Dmol.createViewer(container, { backgroundColor: '#0a0e1a' });
+    var url = 'https://files.rcsb.org/download/' + pdbId + '.pdb';
+    fetch(url).then(r => r.text()).then(data => {
+      viewer.addModel(data, 'pdb');
+      if (style === 'cartoon') {
+        viewer.setStyle({}, {cartoon: {color: 'spectrum'}});
+        viewer.setStyle({hetflag: true, not: {resn: 'HOH'}}, {stick: {colorscheme: 'greenCarbon', radius: 0.15}});
+      } else {
+        viewer.setStyle({chain: 'A'}, {cartoon: {color: 'spectrum', opacity: 0.8}});
+        viewer.setStyle({hetflag: true, not: {resn: 'HOH'}}, {stick: {colorscheme: 'cyanCarbon', radius: 0.2}, sphere: {colorscheme: 'cyanCarbon', radius: 0.4}});
+      }
+      viewer.zoomTo();
+      viewer.render();
+      viewer.zoom(0.9);
+      viewer.render();
+      if (loading) loading.style.display = 'none';
+    }).catch(err => {
+      if (loading) loading.textContent = 'PDB loading requires internet connection. Error: ' + err.message;
+    });
+  } catch(e) {
+    if (loading) loading.textContent = '3D viewer initialization failed: ' + e.message;
+  }
+}
+
+// === SmilesDrawer (v1 API) ===
+function drawMolecule(canvasId, smiles) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  try {
+    SmilesDrawer.parse(smiles, function(tree) {
+      const options = { width: canvas.width, height: canvas.height, bondThickness: 1.5, fontSizeLarge: 11, fontSizeSmall: 7, padding: 15 };
+      const drawer = new SmilesDrawer.Drawer(options);
+      drawer.draw(tree, canvas, 'light');
+    }, function(err) { console.warn('SMILES parse error:', smiles, err); });
+  } catch(e) { console.warn('SmilesDrawer error:', e); }
+}
+
+// === ECharts Radar ===
+function initRadar() {
+  const el = document.getElementById('admetRadar');
+  if (!el) return;
+  const chart = echarts.init(el, 'dark');
+  chart.setOption({
+    backgroundColor: 'transparent',
+    title: { text: 'ADMET 属性对比', left: 'center', textStyle: { color: '#e2e8f0', fontSize: 16 } },
+    tooltip: { trigger: 'item' },
+    legend: { data: ['阿司匹林', '对乙酰氨基酚', '布洛芬'], bottom: 0, textStyle: { color: '#94a3b8' } },
+    radar: {
+      indicator: [
+        { name: '口服吸收', max: 1 }, { name: 'BBB 穿透', max: 1 },
+        { name: 'CYP 安全性', max: 1 }, { name: '半衰期适中', max: 1 },
+        { name: '心脏安全性', max: 1 }, { name: '肝脏安全性', max: 1 },
+        { name: '溶解度', max: 1 }, { name: '生物利用度', max: 1 }
+      ],
+      shape: 'circle',
+      splitArea: { areaStyle: { color: ['rgba(59,130,246,0.03)','rgba(59,130,246,0.06)'] } },
+      axisLine: { lineStyle: { color: '#334155' } },
+      splitLine: { lineStyle: { color: '#334155' } },
+      axisName: { color: '#94a3b8', fontSize: 11 }
+    },
+    series: [{ type: 'radar', data: [
+      { value: [0.85,0.45,0.7,0.4,0.9,0.8,0.6,0.68], name: '阿司匹林', lineStyle:{color:'#3b82f6'}, areaStyle:{color:'rgba(59,130,246,0.15)'}, itemStyle:{color:'#3b82f6'} },
+      { value: [0.9,0.75,0.6,0.35,0.85,0.5,0.75,0.7], name: '对乙酰氨基酚', lineStyle:{color:'#10b981'}, areaStyle:{color:'rgba(16,185,129,0.15)'}, itemStyle:{color:'#10b981'} },
+      { value: [0.95,0.3,0.55,0.6,0.7,0.65,0.5,0.8], name: '布洛芬', lineStyle:{color:'#f59e0b'}, areaStyle:{color:'rgba(245,158,11,0.15)'}, itemStyle:{color:'#f59e0b'} }
+    ]}]
+  });
+  window.addEventListener('resize', () => chart.resize());
+}
+
+// === Init All ===
+window.addEventListener('load', function() {
+  // SmilesDrawer molecules
+  drawMolecule('mol1', 'CC(=O)Oc1ccccc1C(=O)O');
+  drawMolecule('mol2', 'CC(=O)Nc1ccc(O)cc1');
+  drawMolecule('mol3', 'CC(C)Cc1ccc(cc1)C(C)C(=O)O');
+  drawMolecule('mol4', 'O=C(O)c1ccccc1O');
+  drawMolecule('mmpA', 'CC(=O)Nc1ccc(Cl)cc1');
+  drawMolecule('mmpB', 'CC(=O)Nc1ccc(F)cc1');
+
+  // ECharts
+  initRadar();
+
+  // 3D viewers - lazy load on scroll
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var id = entry.target.id;
+        if (id === 'proteinViewer') initViewer('proteinViewer', 'viewerLoading', '2X7F', 'cartoon');
+        if (id === 'dockingViewer') initViewer('dockingViewer', 'dockingLoading', '1M17', 'docking');
+      }
+    });
+  }, { threshold: 0.1 });
+  var v1 = document.getElementById('proteinViewer');
+  var v2 = document.getElementById('dockingViewer');
+  if (v1) obs.observe(v1);
+  if (v2) obs.observe(v2);
+});
+</script>
+</body>
+</html>
