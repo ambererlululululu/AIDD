@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAR Deliberation</title>
-    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/static/style.css?v=24">
+    <link rel="icon" href="/static/favicon.svg?v=2" type="image/svg+xml">
+    <link rel="stylesheet" href="/static/style.css?v=25">
     <script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
 </head>
 <body>
@@ -34,12 +34,12 @@
 
         <!-- Shared Sidebar -->
         <aside id="sidebar" class="hidden">
-            <button class="sidebar-collapse-btn" onclick="toggleMolPanel()" title="Toggle sidebar">
-                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
             <div class="sidebar-inner">
+                <button class="sidebar-collapse-btn" onclick="toggleMolPanel()" title="Toggle sidebar">
+                    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
                 <div class="sidebar-nav">
                     <button class="sidebar-nav-btn active" id="nav-home" onclick="switchView('home')">
                         <svg class="sidebar-nav-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">

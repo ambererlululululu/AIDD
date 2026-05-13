@@ -244,10 +244,8 @@ body {
     top: 16px;
     align-self: start;
 }
-aside#sidebar {
-    position: relative;
-}
 .sidebar-inner {
+    position: relative;
     background: var(--bg-white);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -329,20 +327,19 @@ aside#sidebar {
 /* ── Sidebar Collapse Button ── */
 .sidebar-collapse-btn {
     position: absolute;
-    top: 8px;
-    right: -12px;
+    top: 6px;
+    right: 6px;
     z-index: 10;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     border: 1px solid var(--accent-border);
-    background: var(--bg-white);
+    background: var(--accent-dim);
     cursor: pointer;
     color: #166534;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     transition: all 0.15s ease;
     flex-shrink: 0;
 }
@@ -350,15 +347,11 @@ aside#sidebar {
     background: var(--accent);
     border-color: var(--accent);
     color: var(--accent-dark);
-    box-shadow: 0 2px 8px rgba(118, 251, 145, 0.4);
 }
 .sidebar-collapse-btn svg {
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
     transition: transform 0.25s ease;
-}
-.app-layout.sidebar-collapsed .sidebar-collapse-btn {
-    right: -12px;
 }
 .app-layout.sidebar-collapsed .sidebar-collapse-btn svg {
     transform: rotate(180deg);
