@@ -68,6 +68,11 @@ async def index():
     return Path("static/index.html").read_text(encoding="utf-8")
 
 
+@app.get("/deck", response_class=HTMLResponse)
+async def pitch_deck():
+    return Path("pitch_deck.html").read_text(encoding="utf-8")
+
+
 # ── Projects ──
 
 @app.get("/api/projects")
