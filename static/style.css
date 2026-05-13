@@ -36,7 +36,6 @@ body {
 }
 
 .container {
-    position: relative;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 16px;
@@ -107,12 +106,10 @@ body {
     align-items: center;
     gap: 10px;
 }
-.corner-logo {
-    position: absolute;
-    top: 10px;
-    left: 16px;
+.header-logo {
     width: 28px;
     height: 28px;
+    flex-shrink: 0;
 }
 /* ── Project Context ── */
 .project-context {
@@ -292,6 +289,9 @@ body {
     width: 18px;
     height: 18px;
     flex-shrink: 0;
+}
+.app-layout.sidebar-collapsed .sidebar-nav {
+    padding-top: 32px;
 }
 .app-layout.sidebar-collapsed .sidebar-nav-label {
     display: none;
@@ -495,9 +495,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: background 0.12s ease;
+    transition: background 0.12s ease, border-left-color 0.12s ease;
+    border-left: 3px solid transparent;
 }
-.panel-section-title:hover { background: var(--bg-card); }
+.panel-section-title:hover {
+    background: var(--accent-dim);
+    border-left-color: var(--accent);
+    color: var(--text);
+}
+.panel-section-title .chevron {
+    font-size: 11px;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+}
 .panel-section-body {
     padding: 0 16px 12px;
 }
